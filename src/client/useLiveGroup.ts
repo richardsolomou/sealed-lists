@@ -1,5 +1,6 @@
 import { useQueryClient } from '@tanstack/react-query'
-import { Centrifuge, type ClientInfo } from 'centrifuge'
+import type { ClientInfo } from 'centrifuge'
+import { connectRealtimeClient, createSameOriginRealtimeClient } from 'ras-stack/realtime/client'
 import { useEffect, useState } from 'react'
 import type { RealtimeEvent } from '../adapters/centrifugo'
 import { groupQuery } from './queries'
@@ -20,7 +21,7 @@ export function useLiveGroup(token: string, enabled: boolean) {
     let sweep: ReturnType<typeof setTimeout> | undefined
     let closed = false
     let presenceRequest = 0
-    const realtime = new Centrifuge(websocketUrl(), { data: { token } })
+    const realtime = createSameOriginRealtimeClient({ data: { token } })
     const refresh = () => void queryClient.invalidateQueries({ queryKey: groupQuery(token).queryKey })
     const syncPresence = async () => {
       if (!channel.current) return
@@ -70,12 +71,12 @@ export function useLiveGroup(token: string, enabled: boolean) {
       scheduleTypingSweep()
       void syncPresence()
     })
-    realtime.connect()
+    const disconnect = connectRealtimeClient(realtime)
 
     return () => {
       closed = true
       clearTimeout(sweep)
-      realtime.disconnect()
+      disconnect()
       setPresent([])
     }
   }, [token, enabled, queryClient])
@@ -95,12 +96,6 @@ export function presentPlayers(clients: Record<string, ClientInfo>, typing: Map<
 function connectionName(client: ClientInfo) {
   if (typeof client.connInfo !== 'object' || client.connInfo === null || !('name' in client.connInfo)) return undefined
   return typeof client.connInfo.name === 'string' ? client.connInfo.name : undefined
-}
-
-function websocketUrl() {
-  const url = new URL('/connection/websocket', window.location.origin)
-  url.protocol = url.protocol === 'https:' ? 'wss:' : 'ws:'
-  return url.toString()
 }
 
 function groupEvent(value: unknown): RealtimeEvent | undefined {

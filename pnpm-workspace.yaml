@@ -3,4 +3,5 @@ allowBuilds:
   esbuild: true
   protobufjs: false
 minimumReleaseAgeExclude:
-  - ras-stack@0.2.0
+  - ras-stack@0.8.2
+minimumReleaseAge: 10080
