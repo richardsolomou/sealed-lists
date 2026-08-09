@@ -35,6 +35,12 @@ Live updates are not covered by the unit suite. Changes to realtime connections 
 - `src/components/ui` — shadcn components generated with Base UI.
 - `src/routes` — TanStack Start file routes and API handlers; keep them as coordinators.
 
+## Release notes
+
+Run `pnpm changeset` for changes to released application behavior. Choose `minor` for new capabilities and `patch` for fixes, then write one imperative, user-visible sentence. Documentation, tests, refactors, and tooling-only changes do not need a changeset.
+
+When a changeset reaches `main`, CI updates `package.json` and `CHANGELOG.md`, then creates the matching tag and GitHub Release.
+
 ## Conventions
 
 - Keep Sealed Lists focused on opaque Warhammer 40,000 list submission. Parsing, validation, points totals, and list building belong elsewhere.
