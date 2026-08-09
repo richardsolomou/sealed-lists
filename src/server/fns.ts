@@ -1,7 +1,8 @@
 import { createServerFn } from '@tanstack/react-start'
+import { configuredProviders } from 'ras-stack/auth'
 import { z } from 'zod'
 import { app } from './app'
-import { configuredProviders } from './auth'
+import { SOCIAL_PROVIDERS } from './auth'
 import { mutationRpc, rpc } from './rpc'
 import { createGroupSchema, gameSchema, memberSchema, saveDraftSchema, sealListSchema, startGameSchema, tokenSchema } from './schemas'
 import { currentUser, requireUser } from './session'
@@ -20,7 +21,7 @@ export const me = createServerFn({ method: 'GET' }).handler(() => rpc(() => curr
 
 /** The sign-in page only offers what the deployment has credentials for. */
 export const signInOptions = createServerFn({ method: 'GET' }).handler(() =>
-  rpc(() => ({ providers: configuredProviders(), emailConfigured: app().emailConfigured })),
+  rpc(() => ({ providers: configuredProviders(SOCIAL_PROVIDERS), emailConfigured: app().emailConfigured })),
 )
 
 export const emailPreference = createServerFn({ method: 'GET' }).handler(() =>

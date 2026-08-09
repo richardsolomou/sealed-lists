@@ -1,9 +1,10 @@
 import path from 'node:path'
+import { persistedSecret } from 'ras-stack/auth'
 import { buildEmailDelivery } from '../adapters/email'
 import { createCentrifugoPublisher, type RealtimePublisher } from '../adapters/centrifugo'
 import { databasePath, openDatabase, type SealedListsDatabase } from '../db/connection'
 import { Repository } from '../db/repository'
-import { authSecret, createAuth } from './auth'
+import { createAuth } from './auth'
 import { buildNotifier } from './notify'
 import { SealedListsService } from './service'
 
@@ -35,7 +36,7 @@ export function app(): App {
       database,
       service,
       realtime,
-      auth: createAuth(database, authSecret(path.dirname(file)), email),
+      auth: createAuth(database, persistedSecret({ directory: path.dirname(file) }), email),
       emailConfigured: email.configured,
     }
   }
