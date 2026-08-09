@@ -1,8 +1,8 @@
 import type { RealtimePublisher } from '../adapters/centrifugo'
+import { randomId, randomToken } from 'ras-stack/auth'
 import { LIST_MAX_LENGTH, MEMBERS_MAX, PLAYERS_MIN, gameView, normalizeList } from '../core/game'
 import type { GroupSummary, GroupView, GameView } from '../core/game'
 import type { Repository } from '../db/repository'
-import { createId, createToken } from './crypto'
 import type { Notifier } from './notify'
 
 /**
@@ -22,8 +22,8 @@ export class SealedListsService {
   ) {}
 
   createGroup(userId: string, name: string) {
-    const token = createToken()
-    this.repository.createGroup({ id: createId(), name: name.trim(), token, ownerId: userId, now: this.clock() })
+    const token = randomToken()
+    this.repository.createGroup({ id: randomId(), name: name.trim(), token, ownerId: userId, now: this.clock() })
     return { token }
   }
 
@@ -113,7 +113,7 @@ export class SealedListsService {
     const playing = members.filter((member) => userIds.includes(member.userId))
     if (playing.length !== userIds.length) throw notFound()
     if (playing.length < PLAYERS_MIN) throw new Response(`a game needs at least ${PLAYERS_MIN} players`, { status: 400 })
-    const result = this.repository.createGame({ id: createId(), groupId: group.id, userIds, now: this.clock() })
+    const result = this.repository.createGame({ id: randomId(), groupId: group.id, userIds, now: this.clock() })
     if (result === 'in-progress') throw new Response('this group already has a game running', { status: 409 })
     this.notifier.gameStarted(result.id, userId)
     this.realtime.publish(group.id)
