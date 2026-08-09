@@ -56,3 +56,7 @@ Sealed army list submission for Warhammer 40,000, and nothing else. Lists are op
 `src/core/game.test.ts` pins the visibility rules — including that someone sitting a game out and a signed-out visitor both see nothing — and `src/server/service.test.ts` drives the whole flow against an in-memory SQLite database, inserting `user` rows directly since accounts are better-auth's to create. It has a suite for the link holder who has not joined; a change to who can see what, or to when a game reveals, belongs in these files first.
 
 Nothing in the suite covers what a browser does with a realtime connection, so anything touching live updates needs driving in two real browser contexts: one page acts, the other must catch up without being touched. That is what proves the connection carries changes and not just that the code compiles. A member's group page keeps its WebSocket open, so wait for a visible element rather than network idle.
+
+## Changesets and releases
+
+Run `pnpm changeset` for released application behavior: `minor` for new capability and `patch` for fixes, with one imperative user-visible sentence. Documentation, tests, refactors, and tooling-only changes do not need one. A changeset merged to `main` releases immediately by updating the version and changelog and creating the matching tag and GitHub Release.
