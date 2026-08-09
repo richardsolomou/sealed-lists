@@ -13,7 +13,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite dev",
-    "build": "vite build && rm -rf .output/server/drizzle && cp -R drizzle .output/server/drizzle",
+    "build": "vite build && ras-stack-assets sync",
     "start": "node .output/server/index.mjs",
     "typecheck": "tsc --noEmit",
     "lint": "oxlint --type-aware --deny-warnings .",
@@ -48,7 +48,7 @@
     "lucide-react": "^1.28.0",
     "next-themes": "^0.4.6",
     "nodemailer": "^9.0.3",
-    "ras-stack": "^0.8.2",
+    "ras-stack": "^0.22.0",
     "react": "^19.2.7",
     "react-dom": "^19.2.7",
     "sonner": "^2.0.7",
