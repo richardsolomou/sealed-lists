@@ -1,5 +1,6 @@
 import path from 'node:path'
 import { persistedSecret } from 'ras-stack/auth'
+import { globalSingleton } from 'ras-stack/server'
 import { buildEmailDelivery } from '../adapters/email'
 import { createCentrifugoPublisher, type RealtimePublisher } from '../adapters/centrifugo'
 import { databasePath, openDatabase, type SealedListsDatabase } from '../db/connection'
@@ -18,11 +19,8 @@ type App = {
 
 const appUrl = () => process.env.APP_URL?.trim() || 'http://localhost:3000'
 
-// Dev keeps the instance on globalThis so HMR reloads reuse one SQLite handle.
-const globalApp = globalThis as typeof globalThis & { sealedListsApp?: App }
-
 export function app(): App {
-  if (!globalApp.sealedListsApp) {
+  return globalSingleton('sealed-lists.app', () => {
     const file = databasePath()
     const database = openDatabase(file)
     const repository = new Repository(database)
@@ -32,15 +30,14 @@ export function app(): App {
       url: process.env.CENTRIFUGO_URL?.trim() || 'http://localhost:8000',
     })
     const service = new SealedListsService(repository, Date.now, buildNotifier(repository, email, appUrl), realtime)
-    globalApp.sealedListsApp = {
+    return {
       database,
       service,
       realtime,
       auth: createAuth(database, persistedSecret({ directory: path.dirname(file) }), email),
       emailConfigured: email.configured,
     }
-  }
-  return globalApp.sealedListsApp
+  })
 }
 
 export function requiredEnvironment(name: string) {

@@ -9,7 +9,7 @@ RUN pnpm install --offline --frozen-lockfile
 COPY src ./src
 COPY public ./public
 COPY drizzle ./drizzle
-COPY tsconfig.json vite.config.ts ./
+COPY ras-stack.assets.json tsconfig.json vite.config.ts ./
 RUN pnpm build
 
 FROM centrifugo/centrifugo:v6.9.1 AS centrifugo
