@@ -1,9 +1,11 @@
-import { getRequest } from '@tanstack/react-start/server'
-import { requireSameOrigin } from 'ras-stack/auth'
+import { requireTanStackMutationOrigin } from 'ras-stack/tanstack/server'
 
-export function requireMutationOrigin(request = getRequest()) {
-  return requireSameOrigin(request, {
-    configured: [process.env.APP_URL],
-    trustForwardedHeaders: true,
-  })
+export function requireMutationOrigin(request?: Request) {
+  return requireTanStackMutationOrigin(
+    {
+      configured: [process.env.APP_URL],
+      trustForwardedHeaders: true,
+    },
+    request,
+  )
 }
