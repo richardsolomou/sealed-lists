@@ -8,6 +8,8 @@ import '@fontsource/oswald/500.css'
 import { Button, buttonVariants } from '@/components/ui/button'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { Toaster } from '@/components/ui/sonner'
+import { postHogEnvironment } from 'ras-stack/posthog'
+import { PostHogBetterAuthIdentity, PostHogIntegration } from 'ras-stack/posthog/react'
 import { cn } from '@/lib/utils'
 import { authClient } from '../client/authClient'
 import { meQuery } from '../client/queries'
@@ -15,6 +17,10 @@ import appCss from '../styles.css?url'
 
 const TITLE = 'Sealed Lists'
 const DESCRIPTION = 'Everyone pastes their Warhammer 40,000 list. They stay hidden until the last one is in, then they all open at once.'
+const posthog = postHogEnvironment({
+  projectToken: import.meta.env.VITE_POSTHOG_PROJECT_TOKEN,
+  host: import.meta.env.VITE_POSTHOG_HOST,
+})
 
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
   head: () => ({
@@ -41,27 +47,33 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 })
 
 function RootComponent() {
+  const application = (
+    <>
+      {posthog && <PostHogBetterAuthIdentity authClient={authClient} />}
+      <div className="mx-auto flex min-h-dvh w-full max-w-2xl flex-col px-5">
+        <Header />
+        <div className="flex-1 py-10 sm:py-14">
+          <Outlet />
+        </div>
+        <footer className="border-t border-edge py-6 text-xs text-faint">
+          <a
+            href="https://github.com/richardsolomou/sealed-lists"
+            className="underline decoration-edge underline-offset-4 hover:text-brass"
+          >
+            Source
+          </a>
+        </footer>
+      </div>
+      <Toaster />
+    </>
+  )
   return (
     <html lang="en">
       <head>
         <HeadContent />
       </head>
       <body className="min-h-dvh">
-        <div className="mx-auto flex min-h-dvh w-full max-w-2xl flex-col px-5">
-          <Header />
-          <div className="flex-1 py-10 sm:py-14">
-            <Outlet />
-          </div>
-          <footer className="border-t border-edge py-6 text-xs text-faint">
-            <a
-              href="https://github.com/richardsolomou/sealed-lists"
-              className="underline decoration-edge underline-offset-4 hover:text-brass"
-            >
-              Source
-            </a>
-          </footer>
-        </div>
-        <Toaster />
+        <PostHogIntegration environment={posthog}>{application}</PostHogIntegration>
         <Scripts />
       </body>
     </html>
