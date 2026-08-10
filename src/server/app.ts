@@ -2,6 +2,7 @@ import path from 'node:path'
 import { persistedSecret } from 'ras-stack/auth'
 import { globalSingleton } from 'ras-stack/server'
 import { buildEmailDelivery } from '../adapters/email'
+import { serverPostHog } from '../adapters/posthog'
 import { createCentrifugoPublisher, type RealtimePublisher } from '../adapters/centrifugo'
 import { databasePath, openDatabase, type SealedListsDatabase } from '../db/connection'
 import { Repository } from '../db/repository'
@@ -21,6 +22,7 @@ const appUrl = () => process.env.APP_URL?.trim() || 'http://localhost:3000'
 
 export function app(): App {
   return globalSingleton('sealed-lists.app', () => {
+    void serverPostHog()
     const file = databasePath()
     const database = openDatabase(file)
     const repository = new Repository(database)

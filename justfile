@@ -20,7 +20,7 @@ dev:
     CENTRIFUGO_API_KEY=dev-api CENTRIFUGO_PROXY_SECRET=dev-api APP_URL=http://localhost:3000 DATA_DIR=./data-dev pnpm dev --host 0.0.0.0
 
 realtime *args:
-    pnpm exec ras-stack-realtime --config centrifugo.json --name sealed-lists-realtime --port 8000 --origin http://localhost:3000 --secret dev-api --connect-proxy-endpoint http://host.docker.internal:3000/api/centrifugo/connect {{ args }}
+    pnpm exec ras realtime --config centrifugo.json --name sealed-lists-realtime --port 8000 --origin http://localhost:3000 --secret dev-api --connect-proxy-endpoint http://host.docker.internal:3000/api/centrifugo/connect {{ args }}
 
 format:
     pnpm format
