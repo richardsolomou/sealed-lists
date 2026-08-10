@@ -9,6 +9,7 @@ RUN pnpm install --offline --frozen-lockfile
 COPY src ./src
 COPY public ./public
 COPY drizzle ./drizzle
+COPY scripts/containerRuntime.ts ./scripts/containerRuntime.ts
 COPY ras-stack.assets.json tsconfig.json vite.config.ts ./
 RUN pnpm build
 
@@ -25,9 +26,7 @@ RUN apk add --no-cache tini && mkdir -p /data && chown -R node:node /app /data
 COPY --from=build --chown=node:node /app/.output ./.output
 COPY --from=centrifugo /usr/local/bin/centrifugo /usr/local/bin/centrifugo
 COPY --from=caddy /usr/bin/caddy /usr/local/bin/caddy
-COPY --chown=node:node Caddyfile ./Caddyfile
 COPY --chown=node:node centrifugo.json ./centrifugo.json
-COPY --chmod=755 docker-entrypoint.sh /usr/local/bin/sealed-lists-entrypoint
 COPY --chown=node:node LICENSE ./
 ENV NODE_ENV=production PORT=3001 DATA_DIR=/data
 VOLUME ["/data"]
@@ -35,4 +34,4 @@ EXPOSE 3000
 HEALTHCHECK --interval=30s --timeout=5s --start-period=15s --retries=3 \
   CMD wget -q --spider http://127.0.0.1:3000/api/health || exit 1
 USER node
-ENTRYPOINT ["/sbin/tini", "-g", "--", "/usr/local/bin/sealed-lists-entrypoint"]
+ENTRYPOINT ["/sbin/tini", "-g", "--", "node", ".output/server/container-runtime.mjs"]

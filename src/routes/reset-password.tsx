@@ -1,5 +1,7 @@
 import { useQueryClient } from '@tanstack/react-query'
 import { Link, createFileRoute, useNavigate } from '@tanstack/react-router'
+import { authFailureMessage } from 'ras-stack/auth/client'
+import { useAuthAction } from 'ras-stack/auth/react'
 import { useState } from 'react'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
@@ -22,8 +24,9 @@ function ResetPasswordPage() {
   const navigate = useNavigate()
   const queryClient = useQueryClient()
   const [password, setPassword] = useState('')
-  const [error, setError] = useState('')
-  const [busy, setBusy] = useState(false)
+  const resetPassword = useAuthAction({
+    failureMessage: (failure) => authFailureMessage(failure, 'That link has run out. Ask for a new one.'),
+  })
 
   if (!token) {
     return (
@@ -42,14 +45,8 @@ function ResetPasswordPage() {
 
   async function submit(event: React.FormEvent) {
     event.preventDefault()
-    setError('')
-    setBusy(true)
-    const result = await authClient.resetPassword({ newPassword: password, token })
-    setBusy(false)
-    if (result.error) {
-      setError(result.error.message ?? 'That link has run out. Ask for a new one.')
-      return
-    }
+    const result = await resetPassword.run(() => authClient.resetPassword({ newPassword: password, token }))
+    if (result.error) return
     await queryClient.invalidateQueries()
     toast.success('Password saved.')
     void navigate({ to: '/signin' })
@@ -72,10 +69,10 @@ function ResetPasswordPage() {
                 onChange={(event) => setPassword(event.target.value)}
               />
             </div>
-            <Button type="submit" className="w-full" disabled={password.length < PASSWORD_MIN_LENGTH || busy}>
-              {busy ? 'Saving…' : 'Save password'}
+            <Button type="submit" className="w-full" disabled={password.length < PASSWORD_MIN_LENGTH || resetPassword.busy}>
+              {resetPassword.busy ? 'Saving…' : 'Save password'}
             </Button>
-            {error && <p className="text-sm text-destructive">{error}</p>}
+            {resetPassword.error && <p className="text-sm text-destructive">{resetPassword.error}</p>}
           </form>
         </CardContent>
       </Card>
