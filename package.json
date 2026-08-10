@@ -1,6 +1,6 @@
 {
   "name": "sealed-lists",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "private": true,
   "description": "Sealed army list escrow: everyone submits hidden, nothing is revealed until the last list lands, and revealed lists are locked.",
   "homepage": "https://sealed-lists.ras.sh",

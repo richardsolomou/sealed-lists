@@ -1,5 +1,11 @@
 # sealed-lists
 
+## 0.2.1
+
+### Patch Changes
+
+- 71e87fb: Capture anonymous server telemetry for key game milestones and operational failures.
+
 ## 0.2.0
 
 ### Minor Changes
