@@ -2,7 +2,7 @@ import path from 'node:path'
 import { persistedSecret } from 'ras-stack/auth'
 import { globalSingleton } from 'ras-stack/server'
 import { buildEmailDelivery } from '../adapters/email'
-import { serverPostHog } from '../adapters/posthog'
+import { serverTelemetry } from '../adapters/posthog'
 import { createCentrifugoPublisher, type RealtimePublisher } from '../adapters/centrifugo'
 import { databasePath, openDatabase, type SealedListsDatabase } from '../db/connection'
 import { Repository } from '../db/repository'
@@ -16,13 +16,14 @@ type App = {
   realtime: RealtimePublisher
   auth: ReturnType<typeof createAuth>
   emailConfigured: boolean
+  telemetry: ReturnType<typeof serverTelemetry>
 }
 
 const appUrl = () => process.env.APP_URL?.trim() || 'http://localhost:3000'
 
 export function app(): App {
   return globalSingleton('sealed-lists.app', () => {
-    void serverPostHog()
+    const telemetry = serverTelemetry()
     const file = databasePath()
     const database = openDatabase(file)
     const repository = new Repository(database)
@@ -38,6 +39,7 @@ export function app(): App {
       realtime,
       auth: createAuth(database, persistedSecret({ directory: path.dirname(file) }), email),
       emailConfigured: email.configured,
+      telemetry,
     }
   })
 }
