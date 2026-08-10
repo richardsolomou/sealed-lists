@@ -1,4 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router'
+import { useAuthAction } from 'ras-stack/auth/react'
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
@@ -14,14 +15,12 @@ export const Route = createFileRoute('/forgot-password')({
 function ForgotPasswordPage() {
   const [email, setEmail] = useState('')
   const [sent, setSent] = useState(false)
-  const [busy, setBusy] = useState(false)
+  const requestReset = useAuthAction()
 
   // Always the same answer: whether an address has an account is nobody else's business.
   async function submit(event: React.FormEvent) {
     event.preventDefault()
-    setBusy(true)
-    await authClient.requestPasswordReset({ email: email.trim(), redirectTo: '/reset-password' })
-    setBusy(false)
+    await requestReset.run(() => authClient.requestPasswordReset({ email: email.trim(), redirectTo: '/reset-password' }))
     setSent(true)
   }
 
@@ -42,8 +41,8 @@ function ForgotPasswordPage() {
                   <Label htmlFor="email">Email</Label>
                   <Input id="email" type="email" value={email} autoComplete="email" onChange={(event) => setEmail(event.target.value)} />
                 </div>
-                <Button type="submit" className="w-full" disabled={!email.trim() || busy}>
-                  {busy ? 'Sending…' : 'Send the link'}
+                <Button type="submit" className="w-full" disabled={!email.trim() || requestReset.busy}>
+                  {requestReset.busy ? 'Sending…' : 'Send the link'}
                 </Button>
               </form>
             </CardContent>

@@ -1,5 +1,7 @@
 import { useQueryClient, useSuspenseQuery } from '@tanstack/react-query'
 import { Link, createFileRoute, useNavigate } from '@tanstack/react-router'
+import { authFailureMessage } from 'ras-stack/auth/client'
+import { useAuthAction } from 'ras-stack/auth/react'
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
@@ -28,24 +30,21 @@ function SignInPage() {
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const [error, setError] = useState('')
-  const [busy, setBusy] = useState(false)
+  const submitAction = useAuthAction({
+    failureMessage: (failure) => authFailureMessage(failure, 'That did not work. Check the email and password.'),
+  })
 
   const signingUp = mode === 'sign-up'
   const ready = email.trim() && password.length >= PASSWORD_MIN_LENGTH && (!signingUp || name.trim())
 
   async function submit(event: React.FormEvent) {
     event.preventDefault()
-    setError('')
-    setBusy(true)
-    const result = signingUp
-      ? await authClient.signUp.email({ name: name.trim(), email: email.trim(), password })
-      : await authClient.signIn.email({ email: email.trim(), password })
-    setBusy(false)
-    if (result.error) {
-      setError(result.error.message ?? 'That did not work. Check the email and password.')
-      return
-    }
+    const result = await submitAction.run(() =>
+      signingUp
+        ? authClient.signUp.email({ name: name.trim(), email: email.trim(), password })
+        : authClient.signIn.email({ email: email.trim(), password }),
+    )
+    if (result.error) return
     await queryClient.invalidateQueries()
     void navigate({ to: next ?? '/' })
   }
@@ -98,10 +97,10 @@ function SignInPage() {
               />
               {signingUp && <p className="text-xs text-faint">{PASSWORD_MIN_LENGTH} characters or more.</p>}
             </div>
-            <Button type="submit" className="w-full" disabled={!ready || busy}>
-              {busy ? 'One moment…' : signingUp ? 'Create account' : 'Sign in'}
+            <Button type="submit" className="w-full" disabled={!ready || submitAction.busy}>
+              {submitAction.busy ? 'One moment…' : signingUp ? 'Create account' : 'Sign in'}
             </Button>
-            {error && <p className="text-sm text-destructive">{error}</p>}
+            {submitAction.error && <p className="text-sm text-destructive">{submitAction.error}</p>}
           </form>
         </CardContent>
       </Card>
@@ -114,7 +113,7 @@ function SignInPage() {
             className="underline decoration-edge underline-offset-4 hover:text-brass"
             onClick={() => {
               setMode(signingUp ? 'sign-in' : 'sign-up')
-              setError('')
+              submitAction.clearError()
             }}
           >
             {signingUp ? 'Sign in' : 'Make one'}
