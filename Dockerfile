@@ -14,8 +14,7 @@ COPY scripts/containerRuntime.ts ./scripts/containerRuntime.ts
 COPY ras-stack.assets.json tsconfig.json vite.config.ts ./
 RUN pnpm build
 
-FROM centrifugo/centrifugo:v6.9.1 AS centrifugo
-FROM caddy:2.10.2-alpine AS caddy
+FROM ghcr.io/richardsolomou/ras-stack-runtime-binaries:runtime-v1.0.0@sha256:5f82b2d53b93465bf91cc1bc90b292e94cbdd823cedd3f432dca94097e59163d AS runtime-binaries
 
 FROM node:24-alpine
 LABEL org.opencontainers.image.title="Sealed Lists" \
@@ -25,8 +24,8 @@ LABEL org.opencontainers.image.title="Sealed Lists" \
 WORKDIR /app
 RUN apk add --no-cache tini && mkdir -p /data && chown -R node:node /app /data
 COPY --from=build --chown=node:node /app/.output ./.output
-COPY --from=centrifugo /usr/local/bin/centrifugo /usr/local/bin/centrifugo
-COPY --from=caddy /usr/bin/caddy /usr/local/bin/caddy
+COPY --from=runtime-binaries /usr/local/bin/centrifugo /usr/local/bin/centrifugo
+COPY --from=runtime-binaries /usr/local/bin/caddy /usr/local/bin/caddy
 COPY --chown=node:node centrifugo.json ./centrifugo.json
 COPY --chown=node:node LICENSE ./
 ENV NODE_ENV=production PORT=3001 DATA_DIR=/data
