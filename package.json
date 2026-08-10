@@ -48,7 +48,7 @@
     "lucide-react": "^1.28.0",
     "next-themes": "^0.4.6",
     "nodemailer": "^9.0.3",
-    "ras-stack": "^0.27.0",
+    "ras-stack": "^0.29.0",
     "react": "^19.2.7",
     "react-dom": "^19.2.7",
     "sonner": "^2.0.7",

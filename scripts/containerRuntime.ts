@@ -1,5 +1,4 @@
-import fs from 'node:fs'
-import { caddyRealtimeProxy, caddyRuntimeEnvironment, centrifugoEnvironment, superviseProcesses } from 'ras-stack/runtime'
+import { runRealtimeStack } from 'ras-stack/runtime'
 
 const requiredEnvironment = (name: string) => {
   const value = process.env[name]?.trim()
@@ -13,23 +12,14 @@ const appUrl = requiredEnvironment('APP_URL')
 const realtimeEnvironment = { ...process.env }
 delete realtimeEnvironment.CENTRIFUGO_API_KEY
 delete realtimeEnvironment.CENTRIFUGO_PROXY_SECRET
-Object.assign(
-  realtimeEnvironment,
-  centrifugoEnvironment({ apiKey, allowedOrigins: process.env.CENTRIFUGO_CLIENT_ALLOWED_ORIGINS || appUrl }),
-  {
-    CENTRIFUGO_VAR_PROXY_SECRET: proxySecret,
-  },
-)
+realtimeEnvironment.CENTRIFUGO_VAR_PROXY_SECRET = proxySecret
 
-const caddyfile = '/tmp/sealed-lists-Caddyfile'
-fs.writeFileSync(caddyfile, caddyRealtimeProxy())
-process.exitCode = await superviseProcesses([
-  { name: 'app', command: process.execPath, args: ['/app/.output/server/index.mjs'], env: process.env },
-  { name: 'realtime', command: 'centrifugo', args: ['--config=/app/centrifugo.json'], env: realtimeEnvironment },
-  {
-    name: 'proxy',
-    command: 'caddy',
-    args: ['run', '--config', caddyfile, '--adapter', 'caddyfile'],
-    env: { ...process.env, ...caddyRuntimeEnvironment() },
+process.exitCode = await runRealtimeStack({
+  app: { command: process.execPath, args: ['/app/.output/server/index.mjs'], env: process.env },
+  centrifugo: {
+    configPath: '/app/centrifugo.json',
+    env: realtimeEnvironment,
+    environment: { apiKey, allowedOrigins: process.env.CENTRIFUGO_CLIENT_ALLOWED_ORIGINS || appUrl },
   },
-])
+  caddy: { configPath: '/tmp/sealed-lists-Caddyfile', env: process.env },
+})
