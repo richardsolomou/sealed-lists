@@ -12,7 +12,9 @@ COPY public ./public
 COPY drizzle ./drizzle
 COPY scripts/containerRuntime.ts ./scripts/containerRuntime.ts
 COPY ras-stack.assets.json tsconfig.json vite.config.ts ./
-RUN pnpm build
+ARG VITE_POSTHOG_PROJECT_TOKEN
+ARG VITE_POSTHOG_HOST
+RUN VITE_POSTHOG_PROJECT_TOKEN=$VITE_POSTHOG_PROJECT_TOKEN VITE_POSTHOG_HOST=$VITE_POSTHOG_HOST pnpm build
 
 FROM ghcr.io/richardsolomou/ras-stack-runtime-binaries:runtime-v1.0.0@sha256:5f82b2d53b93465bf91cc1bc90b292e94cbdd823cedd3f432dca94097e59163d AS runtime-binaries
 
