@@ -1,5 +1,11 @@
 # sealed-lists
 
+## 0.2.0
+
+### Minor Changes
+
+- affda6a: Add privacy-safe product analytics, session replay, feature flags, error tracking, and account identity.
+
 ## 0.1.1
 
 ### Patch Changes
