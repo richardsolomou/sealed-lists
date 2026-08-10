@@ -3,5 +3,8 @@ allowBuilds:
   esbuild: true
   protobufjs: false
 minimumReleaseAgeExclude:
-  - ras-stack@0.29.0
+  - ras-stack@0.30.0
 minimumReleaseAge: 10080
+peerDependencyRules:
+  allowedVersions:
+    better-sqlite3: '13'
