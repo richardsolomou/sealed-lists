@@ -52,7 +52,9 @@ export const createGroup = createServerFn({ method: 'POST' })
   .handler(({ data }) =>
     mutationRpc(async () => {
       const viewer = await requireUser()
-      return app().service.createGroup(viewer.id, data.name)
+      const result = app().service.createGroup(viewer.id, data.name)
+      await app().telemetry.capture(viewer.id, 'group_created')
+      return result
     }),
   )
 
@@ -83,7 +85,9 @@ export const joinGroup = createServerFn({ method: 'POST' })
   .handler(({ data }) =>
     mutationRpc(async () => {
       const viewer = await requireUser()
-      return app().service.joinGroup(data.token, viewer.id)
+      const result = app().service.joinGroup(data.token, viewer.id)
+      await app().telemetry.capture(viewer.id, 'group_joined')
+      return result
     }),
   )
 
@@ -92,7 +96,9 @@ export const startGame = createServerFn({ method: 'POST' })
   .handler(({ data }) =>
     mutationRpc(async () => {
       const viewer = await requireUser()
-      return app().service.startGame(data.token, viewer.id, data.userIds)
+      const result = app().service.startGame(data.token, viewer.id, data.userIds)
+      await app().telemetry.capture(viewer.id, 'game_started', { player_count: data.userIds.length })
+      return result
     }),
   )
 
@@ -120,7 +126,9 @@ export const sealList = createServerFn({ method: 'POST' })
   .handler(({ data }) =>
     mutationRpc(async () => {
       const viewer = await requireUser()
-      return app().service.sealList(data.token, viewer.id, data.list)
+      const result = app().service.sealList(data.token, viewer.id, data.list)
+      await app().telemetry.capture(viewer.id, 'list_sealed')
+      return result
     }),
   )
 
