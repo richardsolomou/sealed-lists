@@ -1,0 +1,25 @@
+name: PR preview build
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+concurrency:
+  group: preview-build-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  preview:
+    permissions:
+      contents: read
+      packages: write
+      checks: write
+      issues: write
+    uses: richardsolomou/ras-stack/.github/workflows/build-dokploy-preview.yml@v0.36.0
+    with:
+      package: sealed-lists
+      local-image: sealed-lists
+      domain: sealed-lists.ras.sh
+      marker: <!-- sealed-lists-preview -->
+      note: Preview data is disposable and resets on every deployment. Create a disposable account; never enter real lists or credentials.
+      cache-scope: sealed-lists-preview

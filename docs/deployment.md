@@ -21,6 +21,8 @@ To deploy releases from GitHub Actions, add `DOKPLOY_URL`, `DOKPLOY_API_KEY`, an
 
 Add one domain for the application on container port `3000`. The image routes `/connection/*` to Centrifugo and all other traffic to the application, so Dokploy does not need path-specific routes or a separate Centrifugo service.
 
+Pull request installations belong in a separate staging environment. See [Pull request previews](development/pr-previews.md) for their isolated lifecycle and configuration.
+
 ## Persistent data
 
 `/data` contains the SQLite database and the generated `auth.secret` used to sign sessions. Back up both together. Set `AUTH_SECRET` explicitly if the deployment manages secrets elsewhere; changing it signs every account out.
