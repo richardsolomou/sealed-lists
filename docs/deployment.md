@@ -17,7 +17,7 @@ The image health check reaches the application through the bundled Caddy proxy. 
 
 Releases publish `ghcr.io/richardsolomou/sealed-lists:latest`, a version tag, and an immutable `sha-<commit>` tag. Create an Application that uses the published image rather than rebuilding the repository. Mount a persistent volume at `/data`, then set `APP_URL`, `AUTH_SECRET`, `CENTRIFUGO_API_KEY`, and `CENTRIFUGO_PROXY_SECRET`. Generate a different random value for each secret.
 
-To deploy releases from GitHub Actions, add `DOKPLOY_URL`, `DOKPLOY_API_KEY`, and `DOKPLOY_APPLICATION_ID` as repository secrets, then set the `DOKPLOY_IMAGE_DEPLOY` repository variable to `true`. The release workflow resolves the commit tag to its manifest digest, records the exact reference in the job summary, switches Dokploy to the image provider, and deploys it. Leave the variable unset until the secrets and application are ready; image publication does not depend on Dokploy.
+To deploy releases from GitHub Actions, add `DOKPLOY_URL`, `DOKPLOY_API_KEY`, and `DOKPLOY_APPLICATION_ID` as repository secrets. Leave the `DOKPLOY_IMAGE_DEPLOY` repository variable unset for the first release so GitHub can create the package, make `ghcr.io/richardsolomou/sealed-lists` public in its package settings, then set the variable to `true`. The release workflow resolves the commit tag to its manifest digest, records the exact reference in the job summary, switches Dokploy to the image provider, and deploys it. Image publication does not depend on Dokploy.
 
 Add one domain for the application on container port `3000`. The image routes `/connection/*` to Centrifugo and all other traffic to the application, so Dokploy does not need path-specific routes or a separate Centrifugo service.
 
