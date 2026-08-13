@@ -36,7 +36,9 @@ export const setEmailPreference = createServerFn({ method: 'POST' })
   .handler(({ data }) =>
     mutationRpc(async () => {
       const viewer = await requireUser()
-      return app().service.setEmailPreference(viewer.id, data.gameEmails)
+      const result = app().service.setEmailPreference(viewer.id, data.gameEmails)
+      await app().telemetry.capture(viewer.id, 'game_email_preference_updated', { game_emails_enabled: data.gameEmails })
+      return result
     }),
   )
 
@@ -108,6 +110,7 @@ export const deleteGroup = createServerFn({ method: 'POST' })
     mutationRpc(async () => {
       const viewer = await requireUser()
       app().service.deleteGroup(data.token, viewer.id)
+      await app().telemetry.capture(viewer.id, 'group_deleted')
       return null
     }),
   )
@@ -117,7 +120,9 @@ export const deleteGame = createServerFn({ method: 'POST' })
   .handler(({ data }) =>
     mutationRpc(async () => {
       const viewer = await requireUser()
-      return app().service.deleteGame(data.token, viewer.id, data.gameId)
+      const result = app().service.deleteGame(data.token, viewer.id, data.gameId)
+      await app().telemetry.capture(viewer.id, 'game_deleted')
+      return result
     }),
   )
 
@@ -137,7 +142,9 @@ export const unsealList = createServerFn({ method: 'POST' })
   .handler(({ data }) =>
     mutationRpc(async () => {
       const viewer = await requireUser()
-      return app().service.unsealList(data.token, viewer.id)
+      const result = app().service.unsealList(data.token, viewer.id)
+      await app().telemetry.capture(viewer.id, 'list_unsealed')
+      return result
     }),
   )
 
@@ -168,7 +175,9 @@ export const joinGame = createServerFn({ method: 'POST' })
   .handler(({ data }) =>
     mutationRpc(async () => {
       const viewer = await requireUser()
-      return app().service.joinGame(data.token, viewer.id, data.userId)
+      const result = app().service.joinGame(data.token, viewer.id, data.userId)
+      await app().telemetry.capture(viewer.id, 'player_added_to_game', { added_self: data.userId === viewer.id })
+      return result
     }),
   )
 
@@ -177,7 +186,9 @@ export const dropPlayer = createServerFn({ method: 'POST' })
   .handler(({ data }) =>
     mutationRpc(async () => {
       const viewer = await requireUser()
-      return app().service.dropPlayer(data.token, viewer.id, data.userId)
+      const result = app().service.dropPlayer(data.token, viewer.id, data.userId)
+      await app().telemetry.capture(viewer.id, 'player_dropped_from_game')
+      return result
     }),
   )
 
@@ -186,6 +197,8 @@ export const removeMember = createServerFn({ method: 'POST' })
   .handler(({ data }) =>
     mutationRpc(async () => {
       const viewer = await requireUser()
-      return app().service.removeMember(data.token, viewer.id, data.userId)
+      const result = app().service.removeMember(data.token, viewer.id, data.userId)
+      await app().telemetry.capture(viewer.id, 'group_member_removed', { removed_self: data.userId === viewer.id })
+      return result
     }),
   )
