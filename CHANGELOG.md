@@ -1,5 +1,11 @@
 # sealed-lists
 
+## 0.2.2
+
+### Patch Changes
+
+- e0df835: Publish and deploy release images by immutable digest.
+
 ## 0.2.1
 
 ### Patch Changes
