@@ -19,7 +19,8 @@ jobs:
       packages: write
       checks: write
       issues: write
-    uses: richardsolomou/ras-stack/.github/workflows/deploy-dokploy-preview.yml@v0.36.0
+      pull-requests: write
+    uses: richardsolomou/ras-stack/.github/workflows/deploy-dokploy-preview.yml@v0.36.1
     with:
       package: sealed-lists
       local-image: sealed-lists
