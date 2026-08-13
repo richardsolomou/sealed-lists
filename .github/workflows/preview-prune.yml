@@ -1,0 +1,20 @@
+name: PR preview prune
+
+on:
+  schedule:
+    - cron: '47 4 * * 1'
+  workflow_dispatch:
+
+jobs:
+  previews:
+    permissions:
+      contents: read
+      packages: write
+      pull-requests: read
+    uses: richardsolomou/ras-stack/.github/workflows/prune-dokploy-previews.yml@v0.36.0
+    with:
+      package: sealed-lists
+      application-prefix: sealed-lists
+      domain: sealed-lists.ras.sh
+      port: 3000
+    secrets: inherit
