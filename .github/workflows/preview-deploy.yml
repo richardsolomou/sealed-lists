@@ -20,16 +20,19 @@ jobs:
       checks: write
       issues: write
       pull-requests: write
-    uses: richardsolomou/ras-stack/.github/workflows/deploy-dokploy-preview.yml@v0.42.1
+    uses: richardsolomou/ras-stack/.github/workflows/deploy-dokploy-preview.yml@v0.43.0
     with:
       package: sealed-lists
       local-image: sealed-lists
       application-prefix: sealed-lists
       port: 3000
+      domain: ras.sh
+      subdomain-prefix: sealed-lists-pr
+      cloudflare-zone-id: 63d29d7bf7e0fd1cdbd18331840244a3
       environment: |
         APP_URL={{PREVIEW_URL}}
         CENTRIFUGO_API_KEY={{RANDOM_HEX_32}}
         CENTRIFUGO_PROXY_SECRET={{RANDOM_HEX_32}}
       marker: <!-- sealed-lists-preview -->
-      note: Preview traffic uses HTTP and data resets on every deployment. Create a disposable account with a unique password; never enter real lists or credentials.
+      note: Preview traffic uses HTTPS through Cloudflare and data resets on every deployment. Create a disposable account with a unique password; never enter real lists or credentials.
     secrets: inherit

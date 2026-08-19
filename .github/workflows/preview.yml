@@ -16,10 +16,12 @@ jobs:
       checks: write
       issues: write
       pull-requests: write
-    uses: richardsolomou/ras-stack/.github/workflows/build-dokploy-preview.yml@v0.42.1
+    uses: richardsolomou/ras-stack/.github/workflows/build-dokploy-preview.yml@v0.43.0
     with:
       package: sealed-lists
       local-image: sealed-lists
+      domain: ras.sh
+      subdomain-prefix: sealed-lists-pr
       marker: <!-- sealed-lists-preview -->
-      note: Preview traffic uses HTTP and data resets on every deployment. Create a disposable account with a unique password; never enter real lists or credentials.
+      note: Preview traffic uses HTTPS through Cloudflare and data resets on every deployment. Create a disposable account with a unique password; never enter real lists or credentials.
       cache-scope: sealed-lists-preview
