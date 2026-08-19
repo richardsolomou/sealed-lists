@@ -11,9 +11,12 @@ jobs:
       contents: read
       packages: write
       pull-requests: read
-    uses: richardsolomou/ras-stack/.github/workflows/prune-dokploy-previews.yml@v0.42.1
+    uses: richardsolomou/ras-stack/.github/workflows/prune-dokploy-previews.yml@v0.43.0
     with:
       package: sealed-lists
       application-prefix: sealed-lists
       port: 3000
+      domain: ras.sh
+      subdomain-prefix: sealed-lists-pr
+      cloudflare-zone-id: 63d29d7bf7e0fd1cdbd18331840244a3
     secrets: inherit

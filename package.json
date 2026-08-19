@@ -55,7 +55,7 @@
     "nodemailer": "^9.0.5",
     "posthog-js": "^1.415.1",
     "posthog-node": "^5.48.1",
-    "ras-stack": "^0.42.1",
+    "ras-stack": "^0.43.0",
     "react": "^19.2.7",
     "react-dom": "^19.2.7",
     "sonner": "^2.0.8",
