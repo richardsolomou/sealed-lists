@@ -20,17 +20,16 @@ jobs:
       checks: write
       issues: write
       pull-requests: write
-    uses: richardsolomou/ras-stack/.github/workflows/deploy-dokploy-preview.yml@v0.41.1
+    uses: richardsolomou/ras-stack/.github/workflows/deploy-dokploy-preview.yml@v0.42.0
     with:
       package: sealed-lists
       local-image: sealed-lists
       application-prefix: sealed-lists
-      domain: sealed-lists.ras.sh
       port: 3000
       environment: |
-        APP_URL=https://pr-{{PR_NUMBER}}.sealed-lists.ras.sh
+        APP_URL={{PREVIEW_URL}}
         CENTRIFUGO_API_KEY={{RANDOM_HEX_32}}
         CENTRIFUGO_PROXY_SECRET={{RANDOM_HEX_32}}
       marker: <!-- sealed-lists-preview -->
-      note: Preview data is disposable and resets on every deployment. Create a disposable account; never enter real lists or credentials.
+      note: Preview traffic uses HTTP and data resets on every deployment. Create a disposable account with a unique password; never enter real lists or credentials.
     secrets: inherit
