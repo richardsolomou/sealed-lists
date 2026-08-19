@@ -2,7 +2,7 @@
 
 Every pull request gets an isolated Sealed Lists application in a dedicated Dokploy staging environment. Production remains a separate application and is never used as the parent or destination for previews.
 
-The repository calls ras-stack's standard Dokploy preview workflows with its package, port, and environment template. The shared workflow publishes a commit-specific image alongside production images as `ghcr.io/richardsolomou/sealed-lists:preview-pr-<number>-sha-<commit>`, resolves its digest, asks Dokploy for an `sslip.io` hostname, and deploys it over HTTP. The pull request comment reports which commit is deploying and which commit is live.
+The repository calls ras-stack's standard Dokploy preview workflows with its package, port, and environment template. The shared workflow publishes a commit-specific image alongside production images as `ghcr.io/richardsolomou/sealed-lists:preview-pr-<number>-sha-<commit>`, resolves its digest, asks Dokploy for an `sslip.io` hostname, and deploys it over HTTP. The pull request comment reports which commit is deploying and which commit is live; use its link because the generated hostname is not derived from the pull request number.
 
 Each deployment has an empty, ephemeral SQLite database and newly generated Centrifugo secrets. It has no production volume, application secrets, email credentials, sign-in providers, or production list data. Preview traffic is not encrypted, so create a disposable account with a unique password and never enter real lists or credentials.
 
