@@ -4,6 +4,8 @@ Every pull request gets an isolated Sealed Lists application in a dedicated Dokp
 
 The repository calls ras-stack's standard Dokploy preview workflows with its package, port, and environment template. The shared workflow publishes a commit-specific image alongside production images as `ghcr.io/richardsolomou/sealed-lists:preview-pr-<number>-sha-<commit>`, resolves its digest, and deploys it at `https://sealed-lists-pr-<number>.ras.sh`. Cloudflare proxies the hostname to Dokploy, so the origin firewall remains restricted to Cloudflare traffic and the existing `*.ras.sh` certificate covers every preview.
 
+The URL stays stable for the lifetime of the pull request while each push replaces the deployed image behind it.
+
 Each deployment has an empty, ephemeral SQLite database and newly generated Centrifugo secrets. It has no production volume, application secrets, email credentials, sign-in providers, or production list data. Create a disposable account with a unique password and never enter real lists or credentials.
 
 Fork builds receive no repository secrets. They produce an image artifact in an untrusted workflow; the repository-owned `workflow_run` publishes and deploys it only after workflow approval.
