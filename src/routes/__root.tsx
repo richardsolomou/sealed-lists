@@ -13,6 +13,7 @@ import { PostHogBetterAuthIdentity, PostHogIntegration } from 'ras-stack/posthog
 import { cn } from '@/lib/utils'
 import { authClient } from '../client/authClient'
 import { meQuery } from '../client/queries'
+import { POSTHOG_INGEST_PATH } from '../posthog'
 import appCss from '../styles.css?url'
 
 const TITLE = 'Sealed Lists'
@@ -73,7 +74,9 @@ function RootComponent() {
         <HeadContent />
       </head>
       <body className="min-h-dvh">
-        <PostHogIntegration environment={posthog}>{application}</PostHogIntegration>
+        <PostHogIntegration environment={posthog} ingestPath={POSTHOG_INGEST_PATH}>
+          {application}
+        </PostHogIntegration>
         <Scripts />
       </body>
     </html>

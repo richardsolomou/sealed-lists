@@ -10,6 +10,7 @@ import { postHogBrowserOptions } from 'ras-stack/posthog/client'
 import { tanStackHealthHandler } from 'ras-stack/tanstack/server'
 import { describe, expect, it } from 'vitest'
 import { closeDatabase, openDatabase } from '../db/connection'
+import { POSTHOG_INGEST_PATH } from '../posthog'
 import { mutationRpc } from './rpc'
 
 describe('shared infrastructure conformance', () => {
@@ -31,7 +32,7 @@ describe('shared infrastructure conformance', () => {
 
   it('keeps PostHog browser and request defaults safe', () => {
     expect(() =>
-      assertPostHogBrowserConformance(postHogBrowserOptions({ apiHost: '/ingest', uiHost: 'https://us.posthog.com' })),
+      assertPostHogBrowserConformance(postHogBrowserOptions({ apiHost: POSTHOG_INGEST_PATH, uiHost: 'https://us.posthog.com' })),
     ).not.toThrow()
     expect(() => assertPostHogRequestConformance(postHogRequestContext)).not.toThrow()
   })
