@@ -1,5 +1,11 @@
 # sealed-lists
 
+## 0.2.4
+
+### Patch Changes
+
+- eea0a17: Route PostHog analytics through a custom proxy path so ad-blocker rules targeting the well-known /ingest path no longer block it.
+
 ## 0.2.3
 
 ### Patch Changes
