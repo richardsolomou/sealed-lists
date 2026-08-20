@@ -11,7 +11,7 @@ minimumReleaseAgeExclude:
   - dompurify@3.4.13
   - posthog-js@1.415.1
   - posthog-node@5.48.1
-  - ras-stack@0.43.0
+  - ras-stack@0.44.0
 minimumReleaseAge: 10080
 peerDependencyRules:
   allowedVersions:
