@@ -1,5 +1,11 @@
 # sealed-lists
 
+## 0.2.6
+
+### Patch Changes
+
+- 2ab9949: Align PostHog SDK versions with the shared runtime and use patched Nodemailer 10 for SMTP delivery.
+
 ## 0.2.5
 
 ### Patch Changes
