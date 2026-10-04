@@ -5,7 +5,7 @@ allowBuilds:
   protobufjs: false
 minimumReleaseAgeExclude:
   - ras-stack-config@1.0.0
-  - ras-stack@3.0.0
+  - ras-stack@3.0.1
   - '@posthog/browser-common@0.4.0'
   - '@posthog/core@1.47.0'
   - '@posthog/types@1.402.2'
