@@ -1,5 +1,11 @@
 # sealed-lists
 
+## 0.2.5
+
+### Patch Changes
+
+- 5d4c275: Shut down cleanly so the supervisor can finish its cleanup.
+
 ## 0.2.4
 
 ### Patch Changes
