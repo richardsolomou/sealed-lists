@@ -1,5 +1,5 @@
 import { createStart } from '@tanstack/react-start'
-import { canonicalHostMiddleware } from 'ras-stack/tanstack/server'
+import { canonicalHostMiddleware } from 'ras-stack/tanstack/middleware'
 
 /**
  * Sends every request for a hostname the deployment no longer calls itself to
