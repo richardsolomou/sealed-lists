@@ -5,8 +5,6 @@
 
 **Reveal every Warhammer 40,000 army list at the same time.**
 
-[sealed-lists.ras.sh](https://sealed-lists.ras.sh)
-
 [![Build](https://img.shields.io/github/actions/workflow/status/richardsolomou/sealed-lists/ci.yml?branch=main)](https://github.com/richardsolomou/sealed-lists/actions/workflows/ci.yml) [![License](https://img.shields.io/github/license/richardsolomou/sealed-lists)](LICENSE)
 
 Nobody gets to read an opponent's list first and tailor their own to beat it. Players submit in private; the final submission reveals and locks every list together.
