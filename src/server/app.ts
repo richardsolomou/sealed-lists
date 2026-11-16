@@ -9,6 +9,7 @@ import { Repository } from '../db/repository'
 import { createAuth } from './auth'
 import { buildNotifier } from './notify'
 import { createRealtime, type RealtimeViewerLookup } from './realtime'
+import { channelPolicy } from './realtimeChannels'
 import { SealedListsService } from './service'
 import { currentUser } from './session'
 import { createTelemetry } from './telemetry'
@@ -44,14 +45,18 @@ function createApp() {
       const user = await currentUser(request)
       return user ? { id: user.id, info: { name: user.name } } : undefined
     }
-    const realtime = resources.adopt(createRealtime(viewer), (instance) => instance.close())
-    // Publications coalesce per channel, so typing pings get their own publisher rather than replace a queued change.
-    const typing = resources.adopt(createRealtime(viewer), (instance) => instance.close())
+    const realtime = resources.adopt(
+      createRealtime(
+        viewer,
+        channelPolicy((groupId, userId) => service.isMember(groupId, userId)),
+      ),
+      (instance) => instance.close(),
+    )
     const changes = { publish: (groupId: string) => realtime.publish(groupChannel(groupId), { type: 'change' } satisfies RealtimeEvent) }
     const service = new SealedListsService(repository, Date.now, buildNotifier(repository, email, appUrl), changes)
     // better-sqlite3 transactions are synchronous and Better Auth's are not, so the adapter's `transaction` option stays off.
     const auth = createAuth(drizzleAdapter(database, { provider: 'sqlite', schema }), email)
-    return { telemetry, database, service, realtime, typing, auth, emailConfigured: Boolean(email), close: () => resources.disposeAsync() }
+    return { telemetry, database, service, realtime, auth, emailConfigured: Boolean(email), close: () => resources.disposeAsync() }
   } catch (error) {
     disposeInBackground(resources)
     throw error

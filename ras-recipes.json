@@ -133,8 +133,8 @@
       ]
     },
     "realtime": {
-      "version": 1,
-      "commit": "82fce4523ec914bd2e70aefd4bff84c10fb278c6",
+      "version": 2,
+      "commit": "0184a1e1bc4ababa9b89b4455014ba13be436df2",
       "files": {
         "centrifugo.json": "centrifugo.json",
         "scripts/realtime.test.ts": "scripts/realtime.test.ts",
@@ -146,14 +146,12 @@
         "src/routes/api/realtime.token.ts": "src/routes/api/realtime.token.ts",
         "src/server/realtime.test.ts": "src/server/realtime.test.ts",
         "src/server/realtime.ts": "src/server/realtime.ts",
-        "src/server/realtimeChannels.ts": "src/server/realtimeChannels.ts",
         "src/server/realtimePublisher.test.ts": "src/server/realtimePublisher.test.ts",
         "src/server/realtimePublisher.ts": "src/server/realtimePublisher.ts"
       },
       "notes": [
-        "src/server/realtimeChannels.ts has no server-side channels and lets a browser subscribe only to `group:<id>` channels whose group the viewer belongs to, asking `app().service.isMember`; src/server/realtime.test.ts mocks that lookup and asserts this policy instead of the recipe's `user:` and `updates:` examples.",
+        "`channelPolicy` in src/server/realtimeChannels.ts is a function of the service's membership check, called in src/server/app.ts, because only a group's members may follow its `group:<id>` channel; there are no server-side channels.",
         "centrifugo.json keeps the app's `group` namespace with presence and forced join and leave, and its client limits (one channel per connection, 200 connections, five per user); it has no history or recovery because the page refetches on every subscription.",
-        "src/server/app.ts creates a second `createRealtime` instance, `typing`, for typing pings, because publications coalesce per channel and a typing ping would otherwise replace a queued `change` on the same group channel.",
         "The group page uses `useConnectedRealtimeClient` from src/client/useLiveGroup.ts, with the subscription and presence handling in its `configure`, instead of `RealtimeProvider`, since only that page listens."
       ]
     },

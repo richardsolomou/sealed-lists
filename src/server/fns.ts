@@ -168,11 +168,15 @@ export const saveDraft = createServerFn({ method: 'POST' })
     mutationRpc(async () => {
       const viewer = await requireUser()
       const saved = app().service.saveDraft(data.token, viewer.id, data.draft)
-      app().typing.publish(groupChannel(app().service.memberGroupId(data.token, viewer.id)), {
-        type: 'typing',
-        userId: viewer.id,
-        typing: false,
-      } satisfies RealtimeEvent)
+      app().realtime.publish(
+        groupChannel(app().service.memberGroupId(data.token, viewer.id)),
+        {
+          type: 'typing',
+          userId: viewer.id,
+          typing: false,
+        } satisfies RealtimeEvent,
+        { coalesce: false },
+      )
       return saved
     }),
   )
@@ -182,11 +186,15 @@ export const setTyping = createServerFn({ method: 'POST' })
   .handler(({ data }) =>
     mutationRpc(async () => {
       const viewer = await requireUser()
-      app().typing.publish(groupChannel(app().service.memberGroupId(data.token, viewer.id)), {
-        type: 'typing',
-        userId: viewer.id,
-        typing: true,
-      } satisfies RealtimeEvent)
+      app().realtime.publish(
+        groupChannel(app().service.memberGroupId(data.token, viewer.id)),
+        {
+          type: 'typing',
+          userId: viewer.id,
+          typing: true,
+        } satisfies RealtimeEvent,
+        { coalesce: false },
+      )
       return { typing: true }
     }),
   )
