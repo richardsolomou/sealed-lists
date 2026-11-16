@@ -1,32 +1,32 @@
 import { useQueryClient } from '@tanstack/react-query'
-import type { ClientInfo, PublicationContext, SubscribedContext } from 'centrifuge'
-import { createSameOriginRealtimeClient } from 'ras-stack/realtime/client'
-import { useConnectedRealtimeClient } from 'ras-stack/realtime/react'
+import type { Centrifuge, ClientInfo, PublicationContext } from 'centrifuge'
 import { useCallback, useState } from 'react'
 import type { RealtimeEvent } from '../contracts/realtime'
 import { groupQuery } from './queries'
+import { channelSubscriptionOptions, createRealtimeClient } from './realtime'
+import { useConnectedRealtimeClient } from './useRealtime'
 
 const TYPING_TTL_MS = 6_000
 
 export type PresentPlayer = { userId: string; name: string; typing: boolean }
 
-export function useLiveGroup(token: string, enabled: boolean) {
+/** Follows a group's channel while its page is open: refetches on every change and tracks who is here and typing. */
+export function useLiveGroup(token: string, channel: string | null) {
   const queryClient = useQueryClient()
   const [present, setPresent] = useState<PresentPlayer[]>([])
-  const createClient = useCallback(() => createSameOriginRealtimeClient({ data: { token } }), [token])
   const configure = useCallback(
-    (realtime: ReturnType<typeof createSameOriginRealtimeClient>) => {
-      const channel = { current: '' }
+    (realtime: Centrifuge) => {
+      if (!channel) return undefined
+      const subscription = realtime.newSubscription(channel, channelSubscriptionOptions)
       const typing = new Map<string, number>()
       let sweep: ReturnType<typeof setTimeout> | undefined
       let closed = false
       let presenceRequest = 0
       const refresh = () => void queryClient.invalidateQueries({ queryKey: groupQuery(token).queryKey })
       const syncPresence = async () => {
-        if (!channel.current) return
         const request = ++presenceRequest
         try {
-          const { clients } = await realtime.presence(channel.current)
+          const { clients } = await subscription.presence()
           const players = presentPlayers(clients, typing, Date.now())
           if (!closed && request === presenceRequest) setPresent(players)
         } catch (error) {
@@ -48,8 +48,8 @@ export function useLiveGroup(token: string, enabled: boolean) {
         )
       }
 
-      const subscribed = ({ channel: nextChannel }: SubscribedContext) => {
-        channel.current = nextChannel
+      // Every (re)subscription refetches, since publications missed while disconnected are not replayed.
+      const subscribed = () => {
         refresh()
         void syncPresence()
       }
@@ -62,32 +62,27 @@ export function useLiveGroup(token: string, enabled: boolean) {
           void syncPresence()
           return
         }
-        if (event.type !== 'typing') return
         if (event.typing) typing.set(event.userId, Date.now() + TYPING_TTL_MS)
         else typing.delete(event.userId)
         scheduleTypingSweep()
         void syncPresence()
       }
-      realtime.on('connected', refresh)
-      realtime.on('subscribed', subscribed)
-      realtime.on('join', presenceChanged)
-      realtime.on('leave', presenceChanged)
-      realtime.on('publication', publication)
+      subscription.on('subscribed', subscribed)
+      subscription.on('join', presenceChanged)
+      subscription.on('leave', presenceChanged)
+      subscription.on('publication', publication)
+      subscription.subscribe()
 
       return () => {
         closed = true
         clearTimeout(sweep)
-        realtime.off('connected', refresh)
-        realtime.off('subscribed', subscribed)
-        realtime.off('join', presenceChanged)
-        realtime.off('leave', presenceChanged)
-        realtime.off('publication', publication)
+        realtime.removeSubscription(subscription)
         setPresent([])
       }
     },
-    [queryClient, token],
+    [channel, queryClient, token],
   )
-  useConnectedRealtimeClient(createClient, enabled, { configure })
+  useConnectedRealtimeClient(createRealtimeClient, Boolean(channel), configure)
 
   return present
 }

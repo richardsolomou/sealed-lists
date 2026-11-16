@@ -54,8 +54,8 @@ importers:
         specifier: ^13.0.3
         version: 13.0.3
       centrifuge:
-        specifier: 5.7.1
-        version: 5.7.1
+        specifier: 5.8.0
+        version: 5.8.0
       class-variance-authority:
         specifier: ^0.7.1
         version: 0.7.1
@@ -82,7 +82,7 @@ importers:
         version: 5.74.0(@opentelemetry/api@1.9.1)
       ras-stack:
         specifier: ^4.0.0
-        version: 4.0.0(@opentelemetry/api-logs@0.223.1)(@opentelemetry/exporter-logs-otlp-http@0.223.1(@opentelemetry/api@1.9.1))(@opentelemetry/resources@2.12.1(@opentelemetry/api@1.9.1))(@opentelemetry/sdk-logs@0.223.1(@opentelemetry/api@1.9.1))(@posthog/react@1.11.3(@types/react@19.2.18)(posthog-js@1.434.15(@types/react@19.2.18)(react@19.2.8))(react@19.2.8))(@tanstack/react-start@1.168.46(crossws@0.4.10(srvx@0.11.22))(esbuild@0.28.2)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(rolldown@1.2.3)(rollup@4.68.2)(vite@8.2.1(@types/node@26.2.0)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.12)(yaml@2.9.0)))(better-sqlite3@13.0.3)(centrifuge@5.7.1)(drizzle-orm@0.45.4(@opentelemetry/api@1.9.1)(@types/better-sqlite3@9.6.0)(better-sqlite3@13.0.3)(kysely@0.29.5))(nodemailer@10.4.0)(posthog-js@1.434.15(@types/react@19.2.18)(react@19.2.8))(posthog-node@5.74.0(@opentelemetry/api@1.9.1))(react@19.2.8)
+        version: 4.0.0(@opentelemetry/api-logs@0.223.1)(@opentelemetry/exporter-logs-otlp-http@0.223.1(@opentelemetry/api@1.9.1))(@opentelemetry/resources@2.12.1(@opentelemetry/api@1.9.1))(@opentelemetry/sdk-logs@0.223.1(@opentelemetry/api@1.9.1))(@posthog/react@1.11.3(@types/react@19.2.18)(posthog-js@1.434.15(@types/react@19.2.18)(react@19.2.8))(react@19.2.8))(@tanstack/react-start@1.168.46(crossws@0.4.10(srvx@0.11.22))(esbuild@0.28.2)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(rolldown@1.2.3)(rollup@4.68.2)(vite@8.2.1(@types/node@26.2.0)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.12)(yaml@2.9.0)))(better-sqlite3@13.0.3)(centrifuge@5.8.0)(drizzle-orm@0.45.4(@opentelemetry/api@1.9.1)(@types/better-sqlite3@9.6.0)(better-sqlite3@13.0.3)(kysely@0.29.5))(nodemailer@10.4.0)(posthog-js@1.434.15(@types/react@19.2.18)(react@19.2.8))(posthog-node@5.74.0(@opentelemetry/api@1.9.1))(react@19.2.8)
       react:
         specifier: ^19.2.7
         version: 19.2.8
@@ -132,9 +132,6 @@ importers:
       drizzle-kit:
         specifier: ^0.31.11
         version: 0.31.11
-      esbuild:
-        specifier: ^0.28.2
-        version: 0.28.2
       nitro:
         specifier: 3.0.260610-beta
         version: 3.0.260610-beta(better-sqlite3@13.0.3)(chokidar@5.0.0)(dotenv@17.4.2)(drizzle-orm@0.45.4(@opentelemetry/api@1.9.1)(@types/better-sqlite3@9.6.0)(better-sqlite3@13.0.3)(kysely@0.29.5))(jiti@2.7.0)(rollup@4.68.2)(vite@8.2.1(@types/node@26.2.0)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.12)(yaml@2.9.0))
@@ -2465,8 +2462,8 @@ packages:
   caniuse-lite@1.0.30001809:
     resolution: {integrity: sha512-xxWVywk6a6Arlk+hymeycyn/VgqEfLDxupvhH/xiY5SJ/18kmi9o6MiO320DCUzypORHLtvh0I4i04tUhCNHNQ==}
 
-  centrifuge@5.7.1:
-    resolution: {integrity: sha512-Jq+T/cAulZVJPfRLfKHX2jcELdwt/LNG4wVx7vQlpaLQlNS+s/HVysRlTNYZ/FktP/NY4sKPI1qz2gh2IGamUA==}
+  centrifuge@5.8.0:
+    resolution: {integrity: sha512-ENH1jz6VeRuGb3yHNhgB0V0SqRKX+iYdtM9Du/E59m484epjNPfsgJw4UbmOmjgSXGEita1UoOXlZ6Ba1ooT1g==}
 
   chai@6.2.2:
     resolution: {integrity: sha512-NUPRluOfOiTKBKvWPtSD4PhFvWCqOi0BGStNWs57X9js7XGTprSmFoz5F0tWhR4WPjNeR9jXqdC7/UpSJTnlRg==}
@@ -6324,7 +6321,7 @@ snapshots:
 
   caniuse-lite@1.0.30001809: {}
 
-  centrifuge@5.7.1:
+  centrifuge@5.8.0:
     dependencies:
       events: 3.3.0
       protobufjs: 7.6.5
@@ -7461,7 +7458,7 @@ snapshots:
 
   ras-stack-config@3.0.0: {}
 
-  ras-stack@4.0.0(@opentelemetry/api-logs@0.223.1)(@opentelemetry/exporter-logs-otlp-http@0.223.1(@opentelemetry/api@1.9.1))(@opentelemetry/resources@2.12.1(@opentelemetry/api@1.9.1))(@opentelemetry/sdk-logs@0.223.1(@opentelemetry/api@1.9.1))(@posthog/react@1.11.3(@types/react@19.2.18)(posthog-js@1.434.15(@types/react@19.2.18)(react@19.2.8))(react@19.2.8))(@tanstack/react-start@1.168.46(crossws@0.4.10(srvx@0.11.22))(esbuild@0.28.2)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(rolldown@1.2.3)(rollup@4.68.2)(vite@8.2.1(@types/node@26.2.0)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.12)(yaml@2.9.0)))(better-sqlite3@13.0.3)(centrifuge@5.7.1)(drizzle-orm@0.45.4(@opentelemetry/api@1.9.1)(@types/better-sqlite3@9.6.0)(better-sqlite3@13.0.3)(kysely@0.29.5))(nodemailer@10.4.0)(posthog-js@1.434.15(@types/react@19.2.18)(react@19.2.8))(posthog-node@5.74.0(@opentelemetry/api@1.9.1))(react@19.2.8):
+  ras-stack@4.0.0(@opentelemetry/api-logs@0.223.1)(@opentelemetry/exporter-logs-otlp-http@0.223.1(@opentelemetry/api@1.9.1))(@opentelemetry/resources@2.12.1(@opentelemetry/api@1.9.1))(@opentelemetry/sdk-logs@0.223.1(@opentelemetry/api@1.9.1))(@posthog/react@1.11.3(@types/react@19.2.18)(posthog-js@1.434.15(@types/react@19.2.18)(react@19.2.8))(react@19.2.8))(@tanstack/react-start@1.168.46(crossws@0.4.10(srvx@0.11.22))(esbuild@0.28.2)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(rolldown@1.2.3)(rollup@4.68.2)(vite@8.2.1(@types/node@26.2.0)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.12)(yaml@2.9.0)))(better-sqlite3@13.0.3)(centrifuge@5.8.0)(drizzle-orm@0.45.4(@opentelemetry/api@1.9.1)(@types/better-sqlite3@9.6.0)(better-sqlite3@13.0.3)(kysely@0.29.5))(nodemailer@10.4.0)(posthog-js@1.434.15(@types/react@19.2.18)(react@19.2.8))(posthog-node@5.74.0(@opentelemetry/api@1.9.1))(react@19.2.8):
     dependencies:
       '@changesets/parse': 1.0.0
       '@manypkg/get-packages': 3.1.0
@@ -7473,7 +7470,7 @@ snapshots:
       '@posthog/react': 1.11.3(@types/react@19.2.18)(posthog-js@1.434.15(@types/react@19.2.18)(react@19.2.8))(react@19.2.8)
       '@tanstack/react-start': 1.168.46(crossws@0.4.10(srvx@0.11.22))(esbuild@0.28.2)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(rolldown@1.2.3)(rollup@4.68.2)(vite@8.2.1(@types/node@26.2.0)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.12)(yaml@2.9.0))
       better-sqlite3: 13.0.3
-      centrifuge: 5.7.1
+      centrifuge: 5.8.0
       drizzle-orm: 0.45.4(@opentelemetry/api@1.9.1)(@types/better-sqlite3@9.6.0)(better-sqlite3@13.0.3)(kysely@0.29.5)
       nodemailer: 10.4.0
       posthog-js: 1.434.15(@types/react@19.2.18)(react@19.2.8)

@@ -12,13 +12,12 @@ COPY src ./src
 COPY scripts/posthogSourceMaps.ts ./scripts/posthogSourceMaps.ts
 COPY public ./public
 COPY drizzle ./drizzle
-COPY scripts/containerRuntime.ts ./scripts/containerRuntime.ts
 COPY tsconfig.json vite.config.ts ./
 # The PostHog project token is public, since it ships in the browser bundle; the upload key arrives as a secret instead.
 ARG VITE_POSTHOG_PROJECT_TOKEN VITE_POSTHOG_HOST POSTHOG_UPLOAD_SOURCEMAPS POSTHOG_CLI_PROJECT_ID POSTHOG_CLI_HOST
 RUN --mount=type=secret,id=posthog_cli_api_key,env=POSTHOG_CLI_API_KEY pnpm build
 
-FROM ghcr.io/richardsolomou/ras-stack-runtime-binaries:runtime-v1.0.4@sha256:183261400ef822d3dfb7ae9391dc3836d343e01de41ab131df6a42751f87288e AS runtime-binaries
+FROM ghcr.io/richardsolomou/ras-stack-runtime-binaries:runtime-v1.0.9@sha256:b72916b0db314c9cdaab83142b845e3cba77777c44ecefaaf9e2661c24b5e164 AS runtime-binaries
 
 FROM node:24-alpine
 LABEL org.opencontainers.image.title="Sealed Lists" \
@@ -32,12 +31,14 @@ COPY --from=build --chown=node:node /app/drizzle ./drizzle
 COPY --chown=node:node scripts/database.ts ./.output/server/database.ts
 COPY --from=runtime-binaries /usr/local/bin/centrifugo /usr/local/bin/centrifugo
 COPY --from=runtime-binaries /usr/local/bin/caddy /usr/local/bin/caddy
-COPY --chown=node:node centrifugo.json ./centrifugo.json
+COPY --chown=node:node centrifugo.json ./
+COPY --chown=node:node scripts/realtime.ts ./scripts/
 COPY --chown=node:node LICENSE ./
-ENV NODE_ENV=production PORT=3001 DATA_DIR=/data
+ENV NODE_ENV=production PORT=3000 DATA_DIR=/data
 VOLUME ["/data"]
 EXPOSE 3000
 HEALTHCHECK --interval=30s --timeout=5s --start-period=15s --retries=3 \
   CMD wget -q --spider http://127.0.0.1:3000/api/health || exit 1
 USER node
-ENTRYPOINT ["/sbin/tini", "--", "node", ".output/server/container-runtime.mjs"]
+ENTRYPOINT ["/sbin/tini", "--"]
+CMD ["node", "scripts/realtime.ts", "container"]

@@ -24,6 +24,16 @@ export class Repository {
     })
   }
 
+  isMember(groupId: string, userId: string) {
+    return (
+      this.database
+        .select({ userId: groupMembers.userId })
+        .from(groupMembers)
+        .where(and(eq(groupMembers.groupId, groupId), eq(groupMembers.userId, userId)))
+        .get() !== undefined
+    )
+  }
+
   groupByToken(token: string): Group | undefined {
     const group = this.database.select().from(groups).where(eq(groups.token, token)).get()
     return group ? { group, members: this.membersOf(group.id) } : undefined

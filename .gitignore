@@ -7,7 +7,6 @@ dist/
 src/routeTree.gen.ts
 .output/
 .nitro/
-data-dev/
 .pnpm-store/
 .DS_Store
 .claude/settings.local.json

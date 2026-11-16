@@ -80,6 +80,8 @@ export type GroupView = {
   pastGames: { id: string; number: number }[]
   /** False while a game is still collecting: a group runs one game at a time. */
   canStartGame: boolean
+  /** The live-update channel, for members only; subscribing to it is checked against membership again. */
+  channel: string | null
 }
 
 export type GroupSummary = {

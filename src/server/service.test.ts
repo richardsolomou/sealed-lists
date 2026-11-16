@@ -1,10 +1,9 @@
 import { beforeEach, describe, expect, it } from 'vitest'
-import type { RealtimePublisher } from '../adapters/centrifugo'
 import { normalizeList } from '../core/game'
 import { openDatabase, type AppDatabase } from '../db/database'
 import { Repository } from '../db/repository'
 import { user } from '../db/schema'
-import { SealedListsService } from './service'
+import { SealedListsService, type GroupChanges } from './service'
 import type { Notifier } from './notify'
 
 let database: AppDatabase
@@ -30,7 +29,7 @@ beforeEach(() => {
     gameStarted: (gameId, startedBy) => notified.push(`started:${startedBy}`),
     gameRevealed: () => notified.push('revealed'),
   }
-  const realtime: RealtimePublisher = { publish: (groupId) => changed.push(groupId) }
+  const realtime: GroupChanges = { publish: (groupId) => changed.push(groupId) }
   service = new SealedListsService(new Repository(database), () => now, notifier, realtime)
   for (const name of ['Alex', 'Rich', 'Dan', 'Sam']) makeUser(name.toLowerCase(), name)
 })
@@ -78,6 +77,12 @@ describe('myGroups', () => {
     expect(service.myGroups('alex').map((group) => group.name)).toEqual(['Saturday campaign', 'Tuesday night'])
   })
 
+  it('lets a member follow the group live', () => {
+    const { token } = groupWithGame()
+    const channel = service.groupView(token, 'alex').channel!
+    expect(service.isMember(channel.replace('group:', ''), 'alex')).toBe(true)
+  })
+
   it('leaves out groups you are not in', () => {
     service.createGroup('alex', 'Tuesday night')
     expect(service.myGroups('rich')).toEqual([])
@@ -109,6 +114,17 @@ describe('a link holder who has not joined', () => {
   it('is shown no game at all', () => {
     const { token } = groupWithGame()
     expect(service.groupView(token, 'sam').currentGame).toBeNull()
+  })
+
+  it('is given no live-update channel', () => {
+    const { token } = groupWithGame()
+    expect(service.groupView(token, 'sam').channel).toBeNull()
+  })
+
+  it('may not follow the group live', () => {
+    const { token } = groupWithGame()
+    const channel = service.groupView(token, 'alex').channel!
+    expect(service.isMember(channel.replace('group:', ''), 'sam')).toBe(false)
   })
 
   it('cannot open a game directly', () => {

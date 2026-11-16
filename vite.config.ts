@@ -9,11 +9,7 @@ export default defineConfig(({ mode }) => {
   const sourceMaps = postHogSourceMaps({ ...loadEnv(mode, process.cwd(), ''), ...process.env })
   return {
     resolve: { tsconfigPaths: true },
-    server: {
-      allowedHosts: ['host.docker.internal'],
-      port: 3000,
-      proxy: { '/connection': { target: 'ws://localhost:8000', ws: true } },
-    },
+    server: { port: 3000, proxy: { '/connection': { target: 'ws://127.0.0.1:8000', ws: true } } },
     plugins: [tanstackStart(), nitro(), viteReact(), tailwindcss(), sourceMaps?.client],
     ...(sourceMaps ? { worker: { plugins: () => [sourceMaps.worker()] } } : {}),
   }

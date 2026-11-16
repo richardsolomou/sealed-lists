@@ -63,8 +63,7 @@ function GroupPage() {
   const navigate = useNavigate()
   const { data: group } = useSuspenseQuery(groupQuery(token))
   const { data: viewer } = useSuspenseQuery(meQuery())
-  const isMember = typeof group === 'object' && group !== null && group.isMember
-  const present = useLiveGroup(token, isMember)
+  const present = useLiveGroup(token, typeof group === 'object' && group !== null ? group.channel : null)
   // The loader 404s a link that was already dead, so reaching null here means the
   // group went while this page was open — someone else deleted it. Leaving has to
   // happen in an effect: throwing `notFound()` mid-render hits the error boundary.

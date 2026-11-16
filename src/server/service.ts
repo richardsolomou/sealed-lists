@@ -1,9 +1,12 @@
-import type { RealtimePublisher } from '../adapters/centrifugo'
 import { randomId, randomToken } from './random'
 import { LIST_MAX_LENGTH, MEMBERS_MAX, PLAYERS_MIN, gameView, normalizeList } from '../core/game'
 import type { GroupSummary, GroupView, GameView } from '../core/game'
 import type { Repository } from '../db/repository'
+import { groupChannel } from '../contracts/realtime'
 import type { Notifier } from './notify'
+
+/** Tells a group's open pages that something changed, so they refetch what they may see. */
+export type GroupChanges = { publish: (groupId: string) => void }
 
 /**
  * Every rule that keeps a game fair lives here or in `core/game`; the HTTP
@@ -18,7 +21,7 @@ export class SealedListsService {
     private readonly repository: Repository,
     private readonly clock: () => number = Date.now,
     private readonly notifier: Notifier,
-    private readonly realtime: RealtimePublisher,
+    private readonly realtime: GroupChanges,
   ) {}
 
   createGroup(userId: string, name: string) {
@@ -54,6 +57,7 @@ export class SealedListsService {
       currentGame: isMember && current ? gameView(current, this.repository.entriesOf(current.id), userId) : null,
       pastGames: isMember ? revealed.filter((game) => game.id !== current?.id).map((game) => ({ id: game.id, number: game.number })) : [],
       canStartGame: isMember && !active,
+      channel: isMember ? groupChannel(group.id) : null,
     }
   }
 
@@ -65,9 +69,14 @@ export class SealedListsService {
     return this.groupView(token, userId)
   }
 
-  /** The group behind a link, for a member: all a realtime connection needs to know. */
+  /** The group behind a link, for a member, to publish to its channel. */
   memberGroupId(token: string, userId: string) {
     return this.requireMembership(token, userId).group.id
+  }
+
+  /** Whether someone may follow a group's live updates. */
+  isMember(groupId: string, userId: string) {
+    return this.repository.isMember(groupId, userId)
   }
 
   /**

@@ -2,13 +2,15 @@
 
 import { drizzleAdapter } from 'better-auth/adapters/drizzle'
 import { emailDelivery } from '../adapters/email'
-import { createCentrifugoPublisher } from '../adapters/centrifugo'
+import { groupChannel, type RealtimeEvent } from '../contracts/realtime'
 import { databaseFile, openDatabase } from '../db/database'
 import * as schema from '../db/schema'
 import { Repository } from '../db/repository'
 import { createAuth } from './auth'
 import { buildNotifier } from './notify'
+import { createRealtime, type RealtimeViewerLookup } from './realtime'
 import { SealedListsService } from './service'
+import { currentUser } from './session'
 import { createTelemetry } from './telemetry'
 
 export type App = ReturnType<typeof createApp>
@@ -38,17 +40,18 @@ function createApp() {
     })
     const repository = new Repository(database)
     const email = emailDelivery()
-    const realtime = resources.adopt(
-      createCentrifugoPublisher({
-        apiKey: requiredEnvironment('CENTRIFUGO_API_KEY'),
-        url: process.env.CENTRIFUGO_URL?.trim() || 'http://localhost:8000',
-      }),
-      (publisher) => publisher.close(),
-    )
-    const service = new SealedListsService(repository, Date.now, buildNotifier(repository, email, appUrl), realtime)
+    const viewer: RealtimeViewerLookup = async (request) => {
+      const user = await currentUser(request)
+      return user ? { id: user.id, info: { name: user.name } } : undefined
+    }
+    const realtime = resources.adopt(createRealtime(viewer), (instance) => instance.close())
+    // Publications coalesce per channel, so typing pings get their own publisher rather than replace a queued change.
+    const typing = resources.adopt(createRealtime(viewer), (instance) => instance.close())
+    const changes = { publish: (groupId: string) => realtime.publish(groupChannel(groupId), { type: 'change' } satisfies RealtimeEvent) }
+    const service = new SealedListsService(repository, Date.now, buildNotifier(repository, email, appUrl), changes)
     // better-sqlite3 transactions are synchronous and Better Auth's are not, so the adapter's `transaction` option stays off.
     const auth = createAuth(drizzleAdapter(database, { provider: 'sqlite', schema }), email)
-    return { telemetry, database, service, realtime, auth, emailConfigured: Boolean(email), close: () => resources.disposeAsync() }
+    return { telemetry, database, service, realtime, typing, auth, emailConfigured: Boolean(email), close: () => resources.disposeAsync() }
   } catch (error) {
     disposeInBackground(resources)
     throw error
@@ -68,10 +71,4 @@ export async function closeApp() {
   const current = scope[appKey]
   delete scope[appKey]
   await current?.close()
-}
-
-export function requiredEnvironment(name: string) {
-  const value = process.env[name]?.trim()
-  if (!value) throw new Error(`${name} is required`)
-  return value
 }

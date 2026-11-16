@@ -32,8 +32,6 @@ jobs:
       environment: |
         APP_URL={{PREVIEW_URL}}
         BETTER_AUTH_SECRET={{RANDOM_HEX_32}}
-        CENTRIFUGO_API_KEY={{RANDOM_HEX_32}}
-        CENTRIFUGO_PROXY_SECRET={{RANDOM_HEX_32}}
       marker: <!-- sealed-lists-preview -->
       note: Preview traffic uses HTTPS through Cloudflare and data resets on every deployment. Create a disposable account with a unique password; never enter real lists or credentials.
     secrets: inherit

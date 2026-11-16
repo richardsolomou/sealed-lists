@@ -1,5 +1,6 @@
 import { createServerFn } from '@tanstack/react-start'
 import { z } from 'zod'
+import { groupChannel, type RealtimeEvent } from '../contracts/realtime'
 import { app } from './app'
 import { SOCIAL_PROVIDERS, socialProviders } from './auth'
 import { mutationRpc, rpc } from './rpc'
@@ -167,7 +168,11 @@ export const saveDraft = createServerFn({ method: 'POST' })
     mutationRpc(async () => {
       const viewer = await requireUser()
       const saved = app().service.saveDraft(data.token, viewer.id, data.draft)
-      app().realtime.publish(app().service.memberGroupId(data.token, viewer.id), { type: 'typing', userId: viewer.id, typing: false })
+      app().typing.publish(groupChannel(app().service.memberGroupId(data.token, viewer.id)), {
+        type: 'typing',
+        userId: viewer.id,
+        typing: false,
+      } satisfies RealtimeEvent)
       return saved
     }),
   )
@@ -177,7 +182,11 @@ export const setTyping = createServerFn({ method: 'POST' })
   .handler(({ data }) =>
     mutationRpc(async () => {
       const viewer = await requireUser()
-      app().realtime.publish(app().service.memberGroupId(data.token, viewer.id), { type: 'typing', userId: viewer.id, typing: true })
+      app().typing.publish(groupChannel(app().service.memberGroupId(data.token, viewer.id)), {
+        type: 'typing',
+        userId: viewer.id,
+        typing: true,
+      } satisfies RealtimeEvent)
       return { typing: true }
     }),
   )
