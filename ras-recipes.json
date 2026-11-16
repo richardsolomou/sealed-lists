@@ -59,8 +59,8 @@
       ]
     },
     "deploy-dokploy": {
-      "version": 1,
-      "commit": "ec2a7bdc97f8534e2fe0d9a0581b3b1898e05327",
+      "version": 2,
+      "commit": "0184a1e1bc4ababa9b89b4455014ba13be436df2",
       "files": {
         ".dockerignore": ".dockerignore",
         ".github/workflows/deploy.yml": null,
