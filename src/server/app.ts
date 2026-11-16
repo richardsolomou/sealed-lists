@@ -2,7 +2,7 @@
 
 import path from 'node:path'
 import { persistedSecret } from 'ras-stack/auth'
-import { buildEmailDelivery } from '../adapters/email'
+import { emailDelivery } from '../adapters/email'
 import { createCentrifugoPublisher } from '../adapters/centrifugo'
 import { databaseFile, openDatabase } from '../db/database'
 import { Repository } from '../db/repository'
@@ -38,7 +38,7 @@ function createApp() {
       db.$client.close()
     })
     const repository = new Repository(database)
-    const email = buildEmailDelivery()
+    const email = emailDelivery()
     const realtime = resources.adopt(
       createCentrifugoPublisher({
         apiKey: requiredEnvironment('CENTRIFUGO_API_KEY'),
@@ -48,7 +48,7 @@ function createApp() {
     )
     const service = new SealedListsService(repository, Date.now, buildNotifier(repository, email, appUrl), realtime)
     const auth = createAuth(database, persistedSecret({ directory: path.dirname(file) }), email)
-    return { telemetry, database, service, realtime, auth, emailConfigured: email.configured, close: () => resources.disposeAsync() }
+    return { telemetry, database, service, realtime, auth, emailConfigured: Boolean(email), close: () => resources.disposeAsync() }
   } catch (error) {
     disposeInBackground(resources)
     throw error

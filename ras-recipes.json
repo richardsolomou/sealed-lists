@@ -19,6 +19,20 @@
         "package.json keeps `db:check` (`drizzle-kit check`) in `pnpm check`."
       ]
     },
+    "email-smtp": {
+      "version": 1,
+      "commit": "82fce4523ec914bd2e70aefd4bff84c10fb278c6",
+      "files": {
+        "src/adapters/email.deadline.test.ts": "src/adapters/email.deadline.test.ts",
+        "src/adapters/email.test.ts": "src/adapters/email.test.ts",
+        "src/adapters/email.ts": "src/adapters/email.ts"
+      },
+      "notes": [
+        "SMTP rather than email-posthog: Sealed Lists is open source and self-hostable, and its operators bring their own mail server; the recipe guide's 'mail server someone else configures' case.",
+        "authEmails carries the product's existing plain-text reset and verification copy, without the HTML part, and the authEmails tests assert that copy.",
+        "Game-started and game-revealed emails are built in src/server/emails.ts and sent through the same delivery by src/server/notify.ts, which skips them when no delivery is configured."
+      ]
+    },
     "posthog-server": {
       "version": 2,
       "commit": "82fce4523ec914bd2e70aefd4bff84c10fb278c6",
