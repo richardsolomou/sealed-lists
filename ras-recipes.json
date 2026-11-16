@@ -1,6 +1,17 @@
 {
   "source": "https://github.com/richardsolomou/ras-stack",
   "recipes": {
+    "posthog-server": {
+      "version": 2,
+      "commit": "82fce4523ec914bd2e70aefd4bff84c10fb278c6",
+      "files": {
+        "src/server/rpcTelemetry.test.ts": "src/server/rpcTelemetry.test.ts",
+        "src/server/rpcTelemetry.ts": "src/server/rpcTelemetry.ts",
+        "src/server/telemetry.test.ts": "src/server/telemetry.test.ts",
+        "src/server/telemetry.ts": "src/server/telemetry.ts"
+      },
+      "notes": []
+    },
     "posthog-web": {
       "version": 2,
       "commit": "82fce4523ec914bd2e70aefd4bff84c10fb278c6",

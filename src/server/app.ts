@@ -3,13 +3,13 @@
 import path from 'node:path'
 import { persistedSecret } from 'ras-stack/auth'
 import { buildEmailDelivery } from '../adapters/email'
-import { serverTelemetry } from '../adapters/posthog'
 import { createCentrifugoPublisher } from '../adapters/centrifugo'
 import { closeDatabase, databasePath, openDatabase } from '../db/connection'
 import { Repository } from '../db/repository'
 import { createAuth } from './auth'
 import { buildNotifier } from './notify'
 import { SealedListsService } from './service'
+import { createTelemetry } from './telemetry'
 
 export type App = ReturnType<typeof createApp>
 
@@ -31,7 +31,8 @@ function createApp() {
   // Each resource registers its cleanup as it is created, and closing runs them in reverse.
   const resources = new AsyncDisposableStack()
   try {
-    const telemetry = serverTelemetry()
+    // First, so it closes last and records the others closing.
+    const telemetry = resources.adopt(createTelemetry(), (created) => created.shutdown())
     const file = databasePath()
     const database = resources.adopt(openDatabase(file), closeDatabase)
     const repository = new Repository(database)

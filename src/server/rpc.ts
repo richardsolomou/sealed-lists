@@ -1,5 +1,7 @@
 import { getRequest } from '@tanstack/react-start/server'
+import { app } from './app'
 import { requireSameOrigin } from './origins'
+import { observeServerFunction, reportServerFunctionFailure } from './rpcTelemetry'
 import { currentServerFunction } from './serverFunction'
 
 /** Where a failure happened: the request, the server function it ran, and the status of a thrown `Response`. */
@@ -20,20 +22,19 @@ export function mutationRpc<T>(work: () => Promise<T> | T, request = currentRequ
 }
 
 async function run<T>(work: () => Promise<T> | T, request: Request | undefined): Promise<T> {
-  try {
-    return await work()
-  } catch (thrown) {
-    const status = thrown instanceof Response ? thrown.status : undefined
-    const error =
-      thrown instanceof Response ? new Error((await thrown.text()) || `request failed (${thrown.status})`, { cause: thrown }) : thrown
-    // A 4xx answer is the caller's to fix; a 5xx one, such as an unreachable upstream, is the server's.
-    if (status === undefined || status >= 500) reportFailure(error, failureContext(request, status))
-    throw error
-  }
-}
-
-function reportFailure(error: unknown, context: RpcErrorContext) {
-  console.error({ event: 'server_function_failed', ...context, error })
+  const { telemetry } = app()
+  return observeServerFunction(telemetry, request, async () => {
+    try {
+      return await work()
+    } catch (thrown) {
+      const status = thrown instanceof Response ? thrown.status : undefined
+      const error =
+        thrown instanceof Response ? new Error((await thrown.text()) || `request failed (${thrown.status})`, { cause: thrown }) : thrown
+      // A 4xx answer is the caller's to fix; a 5xx one, such as an unreachable upstream, is the server's.
+      if (status === undefined || status >= 500) reportServerFunctionFailure(telemetry, error, failureContext(request, status))
+      throw error
+    }
+  })
 }
 
 function failureContext(request: Request | undefined, status: number | undefined): RpcErrorContext {
