@@ -42,6 +42,7 @@ function emailedAuth() {
       sent.push(message)
       return Promise.resolve()
     },
+    verify: () => Promise.resolve(),
   })
   return { auth, sent }
 }
