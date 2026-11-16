@@ -40,7 +40,7 @@
     "@opentelemetry/exporter-logs-otlp-http": "0.223.1",
     "@opentelemetry/resources": "2.12.1",
     "@opentelemetry/sdk-logs": "0.223.1",
-    "@posthog/react": "^1.10.3",
+    "@posthog/react": "^1.11.3",
     "@tanstack/react-query": "^5.101.2",
     "@tanstack/react-router": "^1.170.29",
     "@tanstack/react-router-ssr-query": "^1.167.1",

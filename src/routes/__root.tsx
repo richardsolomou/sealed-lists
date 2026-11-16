@@ -9,13 +9,12 @@ import '@fontsource/oswald/500.css'
 import { Button, buttonVariants } from '@/components/ui/button'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { Toaster } from '@/components/ui/sonner'
-import { PostHogBetterAuthIdentity } from 'ras-stack/posthog/react'
 import { cn } from '@/lib/utils'
 import { authClient } from '../client/auth'
 import { chunkRecoveryScript, updateNoticeId } from '../client/chunkRecovery'
 import { meQuery } from '../client/queries'
 import { PostHogIntegration } from '../client/posthog'
-import { bundledPostHog } from '../contracts/posthog'
+import { PostHogIdentity } from '../client/postHogIdentity'
 import appCss from '../styles.css?url'
 
 const TITLE = 'Sealed Lists'
@@ -68,7 +67,7 @@ function Document({ children }: { children: ReactNode }) {
 function Root() {
   return (
     <PostHogIntegration>
-      {bundledPostHog && <PostHogBetterAuthIdentity authClient={authClient} />}
+      <PostHogIdentity />
       <div className="mx-auto flex min-h-dvh w-full max-w-2xl flex-col px-5">
         <Header />
         <div className="flex-1 py-10 sm:py-14">

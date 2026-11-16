@@ -60,6 +60,15 @@
         "Game-started and game-revealed emails are built in src/server/emails.ts and sent through the same delivery by src/server/notify.ts, which skips them when no delivery is configured."
       ]
     },
+    "posthog-auth-identity": {
+      "version": 1,
+      "commit": "82fce4523ec914bd2e70aefd4bff84c10fb278c6",
+      "files": {
+        "src/client/postHogIdentity.test.tsx": "src/client/postHogIdentity.test.tsx",
+        "src/client/postHogIdentity.tsx": "src/client/postHogIdentity.tsx"
+      },
+      "notes": []
+    },
     "posthog-server": {
       "version": 2,
       "commit": "82fce4523ec914bd2e70aefd4bff84c10fb278c6",
@@ -86,8 +95,7 @@
         "src/server/posthogProxy.ts": "src/server/posthogProxy.ts"
       },
       "notes": [
-        "Production images are built by the `production-image` job in .github/workflows/ci.yml after a Changesets release, not by deploy.yml, so the source-map build arguments and upload secret are passed there.",
-        "The root route renders the identity component only when `bundledPostHog` is set, matching the app's earlier behaviour."
+        "Production images are built by the `production-image` job in .github/workflows/ci.yml after a Changesets release, not by deploy.yml, so the source-map build arguments and upload secret are passed there."
       ]
     },
     "start-app": {
