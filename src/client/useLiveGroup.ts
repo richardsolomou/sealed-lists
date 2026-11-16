@@ -3,7 +3,7 @@ import type { ClientInfo, PublicationContext, SubscribedContext } from 'centrifu
 import { createSameOriginRealtimeClient } from 'ras-stack/realtime/client'
 import { useConnectedRealtimeClient } from 'ras-stack/realtime/react'
 import { useCallback, useState } from 'react'
-import type { RealtimeEvent } from '../adapters/centrifugo'
+import type { RealtimeEvent } from '../contracts/realtime'
 import { groupQuery } from './queries'
 
 const TYPING_TTL_MS = 6_000

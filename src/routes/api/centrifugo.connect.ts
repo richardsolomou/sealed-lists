@@ -1,7 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { timingSafeEqual } from 'node:crypto'
 import { z } from 'zod'
-import { groupChannel } from '../../adapters/centrifugo'
+import { groupChannel } from '../../contracts/realtime'
 import { app, requiredEnvironment } from '../../server/app'
 import { requireMutationOrigin } from '../../server/mutationOrigin'
 import { currentUser } from '../../server/session'

@@ -1,0 +1,25 @@
+{
+  "source": "https://github.com/richardsolomou/ras-stack",
+  "recipes": {
+    "tooling": {
+      "version": 2,
+      "commit": "82fce4523ec914bd2e70aefd4bff84c10fb278c6",
+      "files": {
+        ".gitignore": ".gitignore",
+        ".oxfmtrc.json": ".oxfmtrc.json",
+        ".oxlintrc.json": ".oxlintrc.json",
+        "AGENTS.md": "CLAUDE.md",
+        "package.json": "package.json",
+        "pnpm-workspace.yaml": "pnpm-workspace.yaml",
+        "tsconfig.json": "tsconfig.json",
+        "vitest.config.ts": "vitest.config.ts"
+      },
+      "notes": [
+        "AGENTS.md is a symlink to CLAUDE.md, which holds the recipe's paragraph beside the product's agent guide.",
+        "tsconfig.json keeps the `@/*` path alias and vitest.config.ts sets `resolve.tsconfigPaths`, because the shadcn components under src/components/ui import through `@/`.",
+        ".oxlintrc.json also ignores src/components/ui/**, which `shadcn add` generates.",
+        "pnpm-workspace.yaml keeps the peerDependencyRules entry that lets better-auth's better-sqlite3 peer range accept version 13."
+      ]
+    }
+  }
+}

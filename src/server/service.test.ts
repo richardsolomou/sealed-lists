@@ -85,13 +85,13 @@ describe('myGroups', () => {
 
   it('flags a group where you still owe a list', () => {
     groupWithGame()
-    expect(service.myGroups('rich')[0].needsList).toBe(true)
+    expect(service.myGroups('rich')[0]?.needsList).toBe(true)
   })
 
   it('stops flagging once you have sealed', () => {
     const { token } = groupWithGame()
     service.sealList(token, 'rich', 'Rich list')
-    expect(service.myGroups('rich')[0].needsList).toBe(false)
+    expect(service.myGroups('rich')[0]?.needsList).toBe(false)
   })
 })
 

@@ -1,5 +1,8 @@
 {
   "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "extends": ["./node_modules/ras-stack-config/config/oxlint/tanstack.json"],
-  "ignorePatterns": ["src/components/ui/**"]
+  "extends": [
+    "./node_modules/ras-stack-config/config/oxlint/application.json",
+    "./node_modules/ras-stack-config/config/oxlint/layers.json"
+  ],
+  "ignorePatterns": ["node_modules/**", "dist/**", ".output/**", "src/routeTree.gen.ts", "src/components/ui/**"]
 }

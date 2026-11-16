@@ -1,6 +1,5 @@
 import { CentrifugoPublisher } from 'ras-stack/realtime'
-
-export type RealtimeEvent = { type: 'change' } | { type: 'typing'; userId: string; typing: boolean }
+import { groupChannel, type RealtimeEvent } from '../contracts/realtime'
 
 export type RealtimePublisher = {
   publish: (groupId: string, event?: RealtimeEvent) => void
@@ -16,8 +15,6 @@ type RealtimeConfig = {
   url: string
   fetch?: typeof fetch
 }
-
-export const groupChannel = (groupId: string) => `group:${groupId}`
 
 export function createCentrifugoPublisher(config: RealtimeConfig): ManagedRealtimePublisher {
   const publisher = () =>
