@@ -1,11 +1,10 @@
 # Deployment
 
-The Sealed Lists image contains both the application and Centrifugo. They run as separate supervised processes in one container and share no persistent state: only `/data` needs a volume. Before starting, copy the example environment, set `APP_URL` to the public HTTPS origin, and generate separate secrets for publishing and connection authorization. Paste them into `CENTRIFUGO_API_KEY` and `CENTRIFUGO_PROXY_SECRET` in `.env`.
+The Sealed Lists image contains Caddy, the application, and Centrifugo, run as separate supervised processes in one container. Only `/data` needs a volume. Before starting, copy the example environment, set `APP_URL` to the public HTTPS origin, and paste a generated value into `BETTER_AUTH_SECRET` in `.env`. The realtime secret is generated into `/data/realtime-secret` on first start.
 
 ```sh
 cp .env.example .env
-openssl rand -hex 32
-openssl rand -hex 32
+openssl rand -base64 32
 just image
 docker volume create sealed-lists-data
 docker run -d --name sealed-lists --restart unless-stopped --env-file .env -p 3020:3000 -v sealed-lists-data:/data sealed-lists
@@ -15,9 +14,9 @@ The image health check reaches the application through the bundled Caddy proxy. 
 
 ## Dokploy
 
-Releases publish `ghcr.io/richardsolomou/sealed-lists:latest`, a version tag, and an immutable `sha-<commit>` tag. Create an Application that uses the published image rather than rebuilding the repository. Mount a persistent volume at `/data`, then set `APP_URL`, `AUTH_SECRET`, `CENTRIFUGO_API_KEY`, and `CENTRIFUGO_PROXY_SECRET`. Generate a different random value for each secret.
+Releases publish `ghcr.io/richardsolomou/sealed-lists:latest`, a version tag, and an immutable `sha-<commit>` tag. Create an Application that uses the published image rather than rebuilding the repository. Mount a persistent volume at `/data`, then set `APP_URL` and `BETTER_AUTH_SECRET`. Use a named volume, not a bind mount: the image declares no `VOLUME`, so without a mount every deploy starts empty.
 
-To deploy releases from GitHub Actions, add `DOKPLOY_URL`, `DOKPLOY_API_KEY`, and `DOKPLOY_APPLICATION_ID` as repository secrets. Leave the `DOKPLOY_IMAGE_DEPLOY` repository variable unset for the first release so GitHub can create the package, make `ghcr.io/richardsolomou/sealed-lists` public in its package settings, then set the variable to `true`. The release workflow resolves the commit tag to its manifest digest, records the exact reference in the job summary, switches Dokploy to the image provider, and deploys it. Image publication does not depend on Dokploy.
+To deploy releases from GitHub Actions, add `DOKPLOY_URL`, `DOKPLOY_API_KEY`, and `DOKPLOY_APPLICATION_ID` as repository secrets. Leave the `DOKPLOY_IMAGE_DEPLOY` repository variable unset for the first release so GitHub can create the package, make `ghcr.io/richardsolomou/sealed-lists` public in its package settings, then set the variable to `true`. Releases build for `linux/arm64` on an arm64 runner. The release workflow resolves the commit tag to its manifest digest, records the exact reference in the job summary, switches Dokploy to the image provider, and deploys it. Image publication does not depend on Dokploy.
 
 Add one domain for the application on container port `3000`. The image routes `/connection/*` to Centrifugo and all other traffic to the application, so Dokploy does not need path-specific routes or a separate Centrifugo service.
 
@@ -25,13 +24,13 @@ Pull request installations belong in a separate staging environment. See [Pull r
 
 ## Persistent data
 
-`/data` contains the SQLite database and the generated `auth.secret` used to sign sessions. Back up both together. Set `AUTH_SECRET` explicitly if the deployment manages secrets elsewhere; changing it signs every account out.
+`/data` contains the SQLite database, `sealed-lists.sqlite`, a `backups/` copy taken before each schema migration, and the generated `realtime-secret`. `pnpm db:backup` (`docker exec <container> node .output/server/database.ts backup` in the image) takes an online backup. `BETTER_AUTH_SECRET` signs sessions and is required in production; changing it signs every account out. A deployment that set `AUTH_SECRET`, or that relied on the `auth.secret` file earlier releases generated in `/data`, keeps using that secret while `BETTER_AUTH_SECRET` is unset. To move to `BETTER_AUTH_SECRET`, copy the existing value into it unchanged, then remove the old variable; back up `auth.secret` with the database until then.
 
 Lists and games do not expire. Deleting a game or group through the application is the only automatic removal of its list data.
 
 ## Reverse proxy
 
-The reverse proxy must forward `Host`, `X-Forwarded-Host`, and `X-Forwarded-Proto`. Set `APP_URL` when it cannot represent the public origin through those headers.
+Set `APP_URL` to the public origin. Without it, the application trusts `X-Forwarded-Host` and `X-Forwarded-Proto` only when `TRUST_PROXY=true`, which is safe only behind a proxy that replaces both headers.
 
 Forward all traffic to port 3020. The bundled Caddy proxy handles WebSocket upgrades and sends `/connection/*` to Centrifugo without exposing its private HTTP API.
 
@@ -51,7 +50,7 @@ location / {
 
 `APP_URL` also restricts Centrifugo's accepted browser origins and acts as the canonical host. Requests arriving on another hostname are redirected with their path and query intact. Keep the old hostname pointed at the application for previously shared links to continue working.
 
-The application health endpoint is `GET /api/health`. It and the internal Centrifugo authorization endpoint are exempt from canonical-host redirects.
+The application health endpoint is `GET /api/health`. It and loopback callers are exempt from canonical-host redirects.
 
 ## Optional email
 

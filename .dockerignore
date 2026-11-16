@@ -1,8 +1,12 @@
+.git
+.github
 node_modules
 .output
 .nitro
 .tanstack
-.git
+.wrangler
+dist
+.data
 .env
-.env.local
-data-dev
+.env.*
+*.log

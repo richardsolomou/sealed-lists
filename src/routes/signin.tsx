@@ -1,21 +1,20 @@
 import { useQueryClient, useSuspenseQuery } from '@tanstack/react-query'
 import { Link, createFileRoute, useNavigate } from '@tanstack/react-router'
-import { authFailureMessage } from 'ras-stack/auth/client'
-import { useAuthAction } from 'ras-stack/auth/react'
+import { authFailureMessage } from '../client/authFailures'
+import { localRedirectPath } from '../client/localRedirect'
+import { useAuthAction } from '../client/useAuthAction'
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { NAME_MAX_LENGTH, PASSWORD_MIN_LENGTH } from '../core/game'
-import { authClient } from '../client/authClient'
+import { authClient } from '../client/auth'
 import { ProviderButtons } from '../client/components/ProviderButtons'
 import { signInOptionsQuery } from '../client/queries'
 
 export const Route = createFileRoute('/signin')({
-  validateSearch: (search: Record<string, unknown>): { next?: string } => ({
-    next: typeof search.next === 'string' ? search.next : undefined,
-  }),
+  validateSearch: (search: Record<string, unknown>): { next?: string } => ({ next: localRedirectPath(search.next) }),
   loader: ({ context }) => context.queryClient.ensureQueryData(signInOptionsQuery()),
   head: () => ({ meta: [{ title: 'Sign in — Sealed Lists' }] }),
   component: SignInPage,

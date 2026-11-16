@@ -1,49 +1,102 @@
-import { betterAuth } from 'better-auth'
-import { drizzleAdapter } from 'better-auth/adapters/drizzle'
-import { configuredProviderOptions, standardRateLimitOptions, standardSessionOptions, trustedOrigins } from 'ras-stack/auth'
+import { betterAuth, type BetterAuthOptions } from 'better-auth'
+import { tanstackStartCookies } from 'better-auth/tanstack-start'
+import { readFileSync } from 'node:fs'
+import path from 'node:path'
+import { authEmails, emailDelivery, type EmailDelivery } from '../adapters/email'
 import { PASSWORD_MIN_LENGTH } from '../core/game'
-import type { EmailDelivery } from '../adapters/email'
-import type { SealedListsDatabase } from '../db/connection'
-import { schema } from '../db/schema'
-import { resetPasswordEmail, verifyEmail } from './emails'
+import { databaseFile } from '../db/database'
+import { configuredOrigin, trustedOrigins } from './origins'
 
+export type Auth = ReturnType<typeof createAuth>
+
+/** The sign-in providers this application offers, each enabled by its `<NAME>_CLIENT_ID` and `<NAME>_CLIENT_SECRET`. */
 export const SOCIAL_PROVIDERS = ['google', 'discord'] as const
 export type SocialProvider = (typeof SOCIAL_PROVIDERS)[number]
 
-export function createAuth(database: SealedListsDatabase, secret: string, email: EmailDelivery) {
+/** Better Auth for this application; `database` is the Drizzle adapter, created where the database is. */
+export function createAuth(
+  database: BetterAuthOptions['database'],
+  email: EmailDelivery | undefined = emailDelivery(),
+  secret: string | undefined = generatedSecret(),
+) {
+  requireSecretInProduction(secret)
+  const emails = email && authEmails(email)
   return betterAuth({
-    database: drizzleAdapter(database, { provider: 'sqlite', schema }),
+    database,
     secret,
-    baseURL: process.env.APP_URL?.trim() || undefined,
+    baseURL: configuredOrigin(),
+    trustedOrigins,
+    socialProviders: socialProviders(),
     emailAndPassword: {
       enabled: true,
       minPasswordLength: PASSWORD_MIN_LENGTH,
-      autoSignIn: true,
-      sendResetPassword: async ({ user, url }) => {
-        await email.send(resetPasswordEmail(user.email, url))
-      },
+      revokeSessionsOnPasswordReset: true,
+      sendResetPassword: emails?.sendResetPassword,
     },
-    // Unverified accounts can still play: the group already knows who each other
-    // are, and blocking the first game on an inbox would be the wrong trade.
-    emailVerification: {
+    // Unverified accounts can still play: the group already knows who each other are, and blocking the first game on an
+    // inbox would be the wrong trade.
+    emailVerification: emails && {
       sendOnSignUp: true,
       autoSignInAfterVerification: true,
-      sendVerificationEmail: async ({ user, url }) => {
-        await email.send(verifyEmail(user.email, url))
+      sendVerificationEmail: emails.sendVerificationEmail,
+    },
+    account: { encryptOAuthTokens: true },
+    session: { expiresIn: 60 * 60 * 24 * 90, updateAge: 60 * 60 * 24 },
+    rateLimit: {
+      enabled: true,
+      storage: 'database',
+      window: 60,
+      max: 120,
+      customRules: {
+        '/sign-in/email': { window: 60, max: 20 },
+        '/sign-up/email': { window: 60, max: 15 },
+        '/request-password-reset': { window: 60, max: 5 },
+        '/send-verification-email': { window: 60, max: 5 },
+        '/admin/set-user-password': { window: 60, max: 10 },
       },
     },
-    socialProviders: configuredProviderOptions(SOCIAL_PROVIDERS),
-    // Signing in with Google to an account made with a password should land on
-    // the same account, not a second one.
-    account: { accountLinking: { enabled: true, trustedProviders: [...SOCIAL_PROVIDERS] } },
-    /*
-     * Limits are per IP, and a whole group signing up shares one: six friends in
-     * the same room on the same WiFi must not lock the last two out. Generous
-     * enough for that, tight enough to make guessing a password pointless.
-     */
-    rateLimit: standardRateLimitOptions(),
-    session: standardSessionOptions(),
-    advanced: { useSecureCookies: (process.env.APP_URL ?? '').startsWith('https://') },
-    trustedOrigins: trustedOrigins({ trustForwardedHeaders: true }),
+    // Better Auth skips its origin check under test unless this is set, so tests exercise the check production runs.
+    advanced: { disableOriginCheck: false, trustedProxyHeaders: process.env.TRUST_PROXY === 'true' },
+    // Sets the cookies of `auth.api` calls made inside server functions; it must stay the last plugin.
+    plugins: [tanstackStartCookies()],
   })
+}
+
+/** Credentials for each provider with both values set; a provider with only one throws, so a typo cannot hide its button. */
+export function socialProviders(environment: NodeJS.ProcessEnv = process.env) {
+  const providers: Partial<Record<SocialProvider, { clientId: string; clientSecret: string }>> = {}
+  for (const provider of SOCIAL_PROVIDERS) {
+    const name = provider.toUpperCase()
+    const clientId = environment[`${name}_CLIENT_ID`]?.trim()
+    const clientSecret = environment[`${name}_CLIENT_SECRET`]?.trim()
+    if (Boolean(clientId) !== Boolean(clientSecret)) throw new Error(`${name}_CLIENT_ID and ${name}_CLIENT_SECRET must be set together`)
+    if (clientId && clientSecret) providers[provider] = { clientId, clientSecret }
+  }
+  return providers
+}
+
+/**
+ * The secret earlier releases generated into `$DATA_DIR/auth.secret` when no variable was set, used only while no secret
+ * variable is set, so deployments that relied on it keep their sessions. Better Auth reads `AUTH_SECRET` itself.
+ */
+export function generatedSecret(environment: NodeJS.ProcessEnv = process.env) {
+  if (['BETTER_AUTH_SECRET', 'BETTER_AUTH_SECRETS', 'AUTH_SECRET'].some((name) => environment[name]?.trim())) return undefined
+  try {
+    return readFileSync(path.join(path.dirname(databaseFile(environment)), 'auth.secret'), 'utf8').trim() || undefined
+  } catch (error) {
+    if (error instanceof Error && 'code' in error && error.code === 'ENOENT') return undefined
+    throw error
+  }
+}
+
+// Better Auth reads the secret itself but falls back to a public default unless NODE_ENV is production, which a build does not guarantee.
+function requireSecretInProduction(secret: string | undefined) {
+  if (
+    !import.meta.env.PROD ||
+    secret ||
+    ['BETTER_AUTH_SECRET', 'BETTER_AUTH_SECRETS', 'AUTH_SECRET'].some((name) => process.env[name]?.trim())
+  ) {
+    return
+  }
+  throw new Error('BETTER_AUTH_SECRET is required in production; generate one with `openssl rand -base64 32`')
 }

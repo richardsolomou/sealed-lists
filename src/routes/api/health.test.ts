@@ -15,6 +15,7 @@ describe('application health route', () => {
   })
 
   it('reports database unavailability without exposing the failure', async () => {
+    vi.spyOn(console, 'error').mockImplementation(() => undefined)
     get.mockImplementationOnce(() => {
       throw new Error('private database credentials')
     })

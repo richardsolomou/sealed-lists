@@ -2,26 +2,23 @@ import type { QueryClient } from '@tanstack/react-query'
 import { useQueryClient, useSuspenseQuery } from '@tanstack/react-query'
 import { HeadContent, Link, Outlet, Scripts, createRootRouteWithContext, useNavigate } from '@tanstack/react-router'
 import { LogOut, User } from 'lucide-react'
+import type { ReactNode } from 'react'
 import '@fontsource-variable/inter'
 import '@fontsource/ibm-plex-mono/400.css'
 import '@fontsource/oswald/500.css'
 import { Button, buttonVariants } from '@/components/ui/button'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { Toaster } from '@/components/ui/sonner'
-import { postHogEnvironment } from 'ras-stack/posthog'
-import { PostHogBetterAuthIdentity, PostHogIntegration } from 'ras-stack/posthog/react'
 import { cn } from '@/lib/utils'
-import { authClient } from '../client/authClient'
+import { authClient } from '../client/auth'
+import { chunkRecoveryScript, updateNoticeId } from '../client/chunkRecovery'
 import { meQuery } from '../client/queries'
-import { POSTHOG_INGEST_PATH } from '../posthog'
+import { PostHogIntegration } from '../client/posthog'
+import { PostHogIdentity } from '../client/postHogIdentity'
 import appCss from '../styles.css?url'
 
 const TITLE = 'Sealed Lists'
 const DESCRIPTION = 'Everyone pastes their Warhammer 40,000 list. They stay hidden until the last one is in, then they all open at once.'
-const posthog = postHogEnvironment({
-  projectToken: import.meta.env.VITE_POSTHOG_PROJECT_TOKEN,
-  host: import.meta.env.VITE_POSTHOG_HOST,
-})
 
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
   head: () => ({
@@ -42,15 +39,35 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg' },
       { rel: 'stylesheet', href: appCss },
     ],
+    scripts: [{ children: chunkRecoveryScript }],
   }),
   loader: ({ context }) => context.queryClient.ensureQueryData(meQuery()),
-  component: RootComponent,
+  shellComponent: Document,
+  component: Root,
 })
 
-function RootComponent() {
-  const application = (
-    <>
-      {posthog && <PostHogBetterAuthIdentity authClient={authClient} />}
+// A shell keeps the root's error and not-found pages inside the document, and `Root`'s providers inside the root's error boundary.
+function Document({ children }: { children: ReactNode }) {
+  return (
+    <html lang="en">
+      <head>
+        <HeadContent />
+      </head>
+      <body className="min-h-dvh">
+        <p id={updateNoticeId} hidden className="bg-brass px-4 py-2 text-center text-sm text-floor">
+          A new version is available. Reload the page to continue.
+        </p>
+        {children}
+        <Scripts />
+      </body>
+    </html>
+  )
+}
+
+function Root() {
+  return (
+    <PostHogIntegration>
+      <PostHogIdentity />
       <div className="mx-auto flex min-h-dvh w-full max-w-2xl flex-col px-5">
         <Header />
         <div className="flex-1 py-10 sm:py-14">
@@ -66,20 +83,7 @@ function RootComponent() {
         </footer>
       </div>
       <Toaster />
-    </>
-  )
-  return (
-    <html lang="en">
-      <head>
-        <HeadContent />
-      </head>
-      <body className="min-h-dvh">
-        <PostHogIntegration environment={posthog} ingestPath={POSTHOG_INGEST_PATH}>
-          {application}
-        </PostHogIntegration>
-        <Scripts />
-      </body>
-    </html>
+    </PostHogIntegration>
   )
 }
 

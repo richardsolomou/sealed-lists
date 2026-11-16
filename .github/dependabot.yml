@@ -6,8 +6,11 @@ updates:
       interval: weekly
     cooldown:
       default-days: 7
+      exclude:
+        - posthog-*
+        - '@posthog/*'
     allow:
-      - dependency-name: '*'
+      - dependency-type: direct
         update-types:
           - version-update:semver-minor
           - version-update:semver-patch
@@ -32,5 +35,22 @@ updates:
       default-days: 7
     ignore:
       - dependency-name: richardsolomou/ras-stack*
+        update-types:
+          - version-update:semver-major
+    groups:
+      github-actions:
+        applies-to: version-updates
+        patterns:
+          - '*'
+  - package-ecosystem: docker
+    directory: /
+    schedule:
+      interval: weekly
+    cooldown:
+      default-days: 7
+      exclude:
+        - '*ras-stack-runtime-binaries'
+    ignore:
+      - dependency-name: node
         update-types:
           - version-update:semver-major

@@ -1,7 +1,7 @@
 import { useQueryClient } from '@tanstack/react-query'
 import { Link, createFileRoute, useNavigate } from '@tanstack/react-router'
-import { authFailureMessage } from 'ras-stack/auth/client'
-import { useAuthAction } from 'ras-stack/auth/react'
+import { authFailureMessage } from '../client/authFailures'
+import { useAuthAction } from '../client/useAuthAction'
 import { useState } from 'react'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
@@ -9,7 +9,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { PASSWORD_MIN_LENGTH } from '../core/game'
-import { authClient } from '../client/authClient'
+import { authClient } from '../client/auth'
 
 export const Route = createFileRoute('/reset-password')({
   validateSearch: (search: Record<string, unknown>): { token?: string } => ({

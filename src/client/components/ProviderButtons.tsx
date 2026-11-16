@@ -1,5 +1,7 @@
-import { authClient } from '../authClient'
-import type { SocialProvider } from '../../server/auth'
+import { authClient } from '../auth'
+import type { signInOptions } from '../../server/fns'
+
+type SocialProvider = Awaited<ReturnType<typeof signInOptions>>['providers'][number]
 
 const LABELS: Record<SocialProvider, string> = { google: 'Continue with Google', discord: 'Continue with Discord' }
 

@@ -1,8 +1,8 @@
 import { createServerFn } from '@tanstack/react-start'
-import { configuredProviders } from 'ras-stack/auth'
 import { z } from 'zod'
+import { groupChannel, type RealtimeEvent } from '../contracts/realtime'
 import { app } from './app'
-import { SOCIAL_PROVIDERS } from './auth'
+import { SOCIAL_PROVIDERS, socialProviders } from './auth'
 import { mutationRpc, rpc } from './rpc'
 import { createGroupSchema, gameSchema, memberSchema, saveDraftSchema, sealListSchema, startGameSchema, tokenSchema } from './schemas'
 import { currentUser, requireUser } from './session'
@@ -17,11 +17,20 @@ function orNull<T>(work: () => T) {
   }
 }
 
-export const me = createServerFn({ method: 'GET' }).handler(() => rpc(() => currentUser()))
+/** Only what the pages show, not the whole account record. */
+export const me = createServerFn({ method: 'GET' }).handler(() =>
+  rpc(async () => {
+    const user = await currentUser()
+    return user && { id: user.id, name: user.name, email: user.email }
+  }),
+)
 
 /** The sign-in page only offers what the deployment has credentials for. */
 export const signInOptions = createServerFn({ method: 'GET' }).handler(() =>
-  rpc(() => ({ providers: configuredProviders(SOCIAL_PROVIDERS), emailConfigured: app().emailConfigured })),
+  rpc(() => {
+    const configured = socialProviders()
+    return { providers: SOCIAL_PROVIDERS.filter((provider) => configured[provider]), emailConfigured: app().emailConfigured }
+  }),
 )
 
 export const emailPreference = createServerFn({ method: 'GET' }).handler(() =>
@@ -37,7 +46,11 @@ export const setEmailPreference = createServerFn({ method: 'POST' })
     mutationRpc(async () => {
       const viewer = await requireUser()
       const result = app().service.setEmailPreference(viewer.id, data.gameEmails)
-      await app().telemetry.capture(viewer.id, 'game_email_preference_updated', { game_emails_enabled: data.gameEmails })
+      app().telemetry.posthog.capture({
+        distinctId: viewer.id,
+        event: 'game_email_preference_updated',
+        properties: { game_emails_enabled: data.gameEmails },
+      })
       return result
     }),
   )
@@ -55,7 +68,7 @@ export const createGroup = createServerFn({ method: 'POST' })
     mutationRpc(async () => {
       const viewer = await requireUser()
       const result = app().service.createGroup(viewer.id, data.name)
-      await app().telemetry.capture(viewer.id, 'group_created')
+      app().telemetry.posthog.capture({ distinctId: viewer.id, event: 'group_created' })
       return result
     }),
   )
@@ -88,7 +101,7 @@ export const joinGroup = createServerFn({ method: 'POST' })
     mutationRpc(async () => {
       const viewer = await requireUser()
       const result = app().service.joinGroup(data.token, viewer.id)
-      await app().telemetry.capture(viewer.id, 'group_joined')
+      app().telemetry.posthog.capture({ distinctId: viewer.id, event: 'group_joined' })
       return result
     }),
   )
@@ -99,7 +112,7 @@ export const startGame = createServerFn({ method: 'POST' })
     mutationRpc(async () => {
       const viewer = await requireUser()
       const result = app().service.startGame(data.token, viewer.id, data.userIds)
-      await app().telemetry.capture(viewer.id, 'game_started', { player_count: data.userIds.length })
+      app().telemetry.posthog.capture({ distinctId: viewer.id, event: 'game_started', properties: { player_count: data.userIds.length } })
       return result
     }),
   )
@@ -110,7 +123,7 @@ export const deleteGroup = createServerFn({ method: 'POST' })
     mutationRpc(async () => {
       const viewer = await requireUser()
       app().service.deleteGroup(data.token, viewer.id)
-      await app().telemetry.capture(viewer.id, 'group_deleted')
+      app().telemetry.posthog.capture({ distinctId: viewer.id, event: 'group_deleted' })
       return null
     }),
   )
@@ -121,7 +134,7 @@ export const deleteGame = createServerFn({ method: 'POST' })
     mutationRpc(async () => {
       const viewer = await requireUser()
       const result = app().service.deleteGame(data.token, viewer.id, data.gameId)
-      await app().telemetry.capture(viewer.id, 'game_deleted')
+      app().telemetry.posthog.capture({ distinctId: viewer.id, event: 'game_deleted' })
       return result
     }),
   )
@@ -132,7 +145,7 @@ export const sealList = createServerFn({ method: 'POST' })
     mutationRpc(async () => {
       const viewer = await requireUser()
       const result = app().service.sealList(data.token, viewer.id, data.list)
-      await app().telemetry.capture(viewer.id, 'list_sealed')
+      app().telemetry.posthog.capture({ distinctId: viewer.id, event: 'list_sealed' })
       return result
     }),
   )
@@ -143,7 +156,7 @@ export const unsealList = createServerFn({ method: 'POST' })
     mutationRpc(async () => {
       const viewer = await requireUser()
       const result = app().service.unsealList(data.token, viewer.id)
-      await app().telemetry.capture(viewer.id, 'list_unsealed')
+      app().telemetry.posthog.capture({ distinctId: viewer.id, event: 'list_unsealed' })
       return result
     }),
   )
@@ -155,7 +168,15 @@ export const saveDraft = createServerFn({ method: 'POST' })
     mutationRpc(async () => {
       const viewer = await requireUser()
       const saved = app().service.saveDraft(data.token, viewer.id, data.draft)
-      app().realtime.publish(app().service.memberGroupId(data.token, viewer.id), { type: 'typing', userId: viewer.id, typing: false })
+      app().realtime.publish(
+        groupChannel(app().service.memberGroupId(data.token, viewer.id)),
+        {
+          type: 'typing',
+          userId: viewer.id,
+          typing: false,
+        } satisfies RealtimeEvent,
+        { coalesce: false },
+      )
       return saved
     }),
   )
@@ -165,7 +186,15 @@ export const setTyping = createServerFn({ method: 'POST' })
   .handler(({ data }) =>
     mutationRpc(async () => {
       const viewer = await requireUser()
-      app().realtime.publish(app().service.memberGroupId(data.token, viewer.id), { type: 'typing', userId: viewer.id, typing: true })
+      app().realtime.publish(
+        groupChannel(app().service.memberGroupId(data.token, viewer.id)),
+        {
+          type: 'typing',
+          userId: viewer.id,
+          typing: true,
+        } satisfies RealtimeEvent,
+        { coalesce: false },
+      )
       return { typing: true }
     }),
   )
@@ -176,7 +205,11 @@ export const joinGame = createServerFn({ method: 'POST' })
     mutationRpc(async () => {
       const viewer = await requireUser()
       const result = app().service.joinGame(data.token, viewer.id, data.userId)
-      await app().telemetry.capture(viewer.id, 'player_added_to_game', { added_self: data.userId === viewer.id })
+      app().telemetry.posthog.capture({
+        distinctId: viewer.id,
+        event: 'player_added_to_game',
+        properties: { added_self: data.userId === viewer.id },
+      })
       return result
     }),
   )
@@ -187,7 +220,7 @@ export const dropPlayer = createServerFn({ method: 'POST' })
     mutationRpc(async () => {
       const viewer = await requireUser()
       const result = app().service.dropPlayer(data.token, viewer.id, data.userId)
-      await app().telemetry.capture(viewer.id, 'player_dropped_from_game')
+      app().telemetry.posthog.capture({ distinctId: viewer.id, event: 'player_dropped_from_game' })
       return result
     }),
   )
@@ -198,7 +231,11 @@ export const removeMember = createServerFn({ method: 'POST' })
     mutationRpc(async () => {
       const viewer = await requireUser()
       const result = app().service.removeMember(data.token, viewer.id, data.userId)
-      await app().telemetry.capture(viewer.id, 'group_member_removed', { removed_self: data.userId === viewer.id })
+      app().telemetry.posthog.capture({
+        distinctId: viewer.id,
+        event: 'group_member_removed',
+        properties: { removed_self: data.userId === viewer.id },
+      })
       return result
     }),
   )

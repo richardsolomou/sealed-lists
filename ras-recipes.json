@@ -1,0 +1,216 @@
+{
+  "source": "https://github.com/richardsolomou/ras-stack",
+  "recipes": {
+    "auth": {
+      "version": 2,
+      "commit": "0184a1e1bc4ababa9b89b4455014ba13be436df2",
+      "files": {
+        "src/client/auth.ts": "src/client/auth.ts",
+        "src/client/authFailures.test.ts": "src/client/authFailures.test.ts",
+        "src/client/authFailures.ts": "src/client/authFailures.ts",
+        "src/client/localRedirect.test.ts": "src/client/localRedirect.test.ts",
+        "src/client/localRedirect.ts": "src/client/localRedirect.ts",
+        "src/client/useAuthAction.test.ts": "src/client/useAuthAction.test.ts",
+        "src/client/useAuthAction.ts": "src/client/useAuthAction.ts",
+        "src/db/authSchema.ts": null,
+        "src/routes/api/auth.$.ts": "src/routes/api/auth.$.ts",
+        "src/server/auth.test.ts": "src/server/auth.test.ts",
+        "src/server/auth.ts": "src/server/auth.ts",
+        "src/server/random.test.ts": "src/server/random.test.ts",
+        "src/server/random.ts": "src/server/random.ts",
+        "src/server/session.ts": "src/server/session.ts"
+      },
+      "notes": [
+        "The Better Auth tables stay in src/db/schema.ts in the layout the existing database has (camelCase columns, ISO-text dates), not the recipe's src/db/authSchema.ts, because the production data already uses them; Better Auth 1.7's schema check passes against them (src/server/authFlow.test.ts).",
+        "createAuth takes a third argument, `generatedSecret()`: when none of BETTER_AUTH_SECRET, BETTER_AUTH_SECRETS, or AUTH_SECRET is set, it reads `$DATA_DIR/auth.secret`, which ras-stack 4's persistedSecret generated, so deployments that relied on that file keep their sessions; the production guard accepts AUTH_SECRET or the file too. Better Auth reads AUTH_SECRET itself.",
+        "emailAndPassword sets `minPasswordLength` to the product's PASSWORD_MIN_LENGTH, and the verification-email comment explains why verification is not required.",
+        "`me` returns only the user's id, name, and email to the browser, not the whole Better Auth user.",
+        "The sign-in, forgot-password, and reset-password pages are the product's own (src/routes/signin.tsx and siblings) and keep controlled inputs."
+      ]
+    },
+    "ci": {
+      "version": 1,
+      "commit": "ec2a7bdc97f8534e2fe0d9a0581b3b1898e05327",
+      "files": {
+        ".github/dependabot.yml": ".github/dependabot.yml",
+        ".github/workflows/ci.yml": ".github/workflows/ci.yml"
+      },
+      "notes": [
+        "ci.yml keeps three jobs beyond `check`: `image`, which builds the Dockerfile on every pull request; `release`, which runs the shared Changesets release workflow on `main`; and `production-image`, which publishes and deploys each release (see deploy-dokploy's notes)."
+      ]
+    },
+    "database-sqlite": {
+      "version": 2,
+      "commit": "0184a1e1bc4ababa9b89b4455014ba13be436df2",
+      "files": {
+        "drizzle.config.ts": "drizzle.config.ts",
+        "scripts/database.test.ts": "scripts/database.test.ts",
+        "scripts/database.ts": "scripts/database.ts",
+        "scripts/databaseFile.ts": "scripts/databaseFile.ts",
+        "src/db/database.test.ts": "src/db/database.test.ts",
+        "src/db/database.ts": "src/db/database.ts",
+        "src/server/database.test.ts": "src/server/database.test.ts"
+      },
+      "notes": [
+        "`databaseFileName` in scripts/databaseFile.ts is `sealed-lists.sqlite`, the name deployments already have.",
+        "src/db/schema.ts and drizzle/ are the application's own, with its existing migration history; the recipe's starter `note` table and `0000_init` migration were not used.",
+        "src/server/database.test.ts writes a `groups` row instead of the starter `note` table.",
+        "package.json keeps `db:check` (`drizzle-kit check`) in `pnpm check`."
+      ]
+    },
+    "deploy-dokploy": {
+      "version": 2,
+      "commit": "0184a1e1bc4ababa9b89b4455014ba13be436df2",
+      "files": {
+        ".dockerignore": ".dockerignore",
+        ".github/workflows/deploy.yml": null,
+        ".github/workflows/preview-deploy.yml": ".github/workflows/preview-deploy.yml",
+        ".github/workflows/preview-prune.yml": ".github/workflows/preview-prune.yml",
+        ".github/workflows/preview.yml": ".github/workflows/preview.yml",
+        "Dockerfile": "Dockerfile",
+        "src/server/shutdown.test.ts": "src/server/shutdown.test.ts",
+        "src/server/shutdown.ts": "src/server/shutdown.ts"
+      },
+      "notes": [
+        "No .github/workflows/deploy.yml: production images are published and deployed by the `production-image` job in .github/workflows/ci.yml after a Changesets release, gated by the `DOKPLOY_IMAGE_DEPLOY` variable, with the recipe's arm64 runner, platform, attestation, environment, and GHCR pull settings.",
+        "The Dockerfile keeps the app's OCI labels and copies LICENSE into the image, as the AGPL source notice.",
+        "The preview workflows keep the `ras.sh` Cloudflare zone id inline rather than reading `vars.CLOUDFLARE_ZONE_ID`, and the prune job keeps its own cron minute.",
+        "The preview note keeps the app's wording about creating a disposable account."
+      ]
+    },
+    "email-smtp": {
+      "version": 1,
+      "commit": "82fce4523ec914bd2e70aefd4bff84c10fb278c6",
+      "files": {
+        "src/adapters/email.deadline.test.ts": "src/adapters/email.deadline.test.ts",
+        "src/adapters/email.test.ts": "src/adapters/email.test.ts",
+        "src/adapters/email.ts": "src/adapters/email.ts"
+      },
+      "notes": [
+        "SMTP rather than email-posthog: Sealed Lists is open source and self-hostable, and its operators bring their own mail server; the recipe guide's 'mail server someone else configures' case.",
+        "authEmails carries the product's existing plain-text reset and verification copy, without the HTML part, and the authEmails tests assert that copy.",
+        "Game-started and game-revealed emails are built in src/server/emails.ts and sent through the same delivery by src/server/notify.ts, which skips them when no delivery is configured."
+      ]
+    },
+    "posthog-auth-identity": {
+      "version": 2,
+      "commit": "0184a1e1bc4ababa9b89b4455014ba13be436df2",
+      "files": {
+        "src/client/postHogIdentity.test.tsx": "src/client/postHogIdentity.test.tsx",
+        "src/client/postHogIdentity.tsx": "src/client/postHogIdentity.tsx"
+      },
+      "notes": []
+    },
+    "posthog-server": {
+      "version": 3,
+      "commit": "0184a1e1bc4ababa9b89b4455014ba13be436df2",
+      "files": {
+        "src/server/rpcTelemetry.test.ts": "src/server/rpcTelemetry.test.ts",
+        "src/server/rpcTelemetry.ts": "src/server/rpcTelemetry.ts",
+        "src/server/telemetry.test.ts": "src/server/telemetry.test.ts",
+        "src/server/telemetry.ts": "src/server/telemetry.ts"
+      },
+      "notes": []
+    },
+    "posthog-web": {
+      "version": 4,
+      "commit": "0184a1e1bc4ababa9b89b4455014ba13be436df2",
+      "files": {
+        "scripts/posthogSourceMaps.test.ts": "scripts/posthogSourceMaps.test.ts",
+        "scripts/posthogSourceMaps.ts": "scripts/posthogSourceMaps.ts",
+        "src/client/posthog.test.tsx": "src/client/posthog.test.tsx",
+        "src/client/posthog.tsx": "src/client/posthog.tsx",
+        "src/client/posthogOptions.test.ts": "src/client/posthogOptions.test.ts",
+        "src/client/posthogOptions.ts": "src/client/posthogOptions.ts",
+        "src/contracts/posthog.test.ts": "src/contracts/posthog.test.ts",
+        "src/contracts/posthog.ts": "src/contracts/posthog.ts",
+        "src/routes/t/$.ts": "src/routes/t/$.ts",
+        "src/server/posthogProxy.test.ts": "src/server/posthogProxy.test.ts",
+        "src/server/posthogProxy.ts": "src/server/posthogProxy.ts"
+      },
+      "notes": [
+        "Production images are built by the `production-image` job in .github/workflows/ci.yml after a Changesets release, not by deploy.yml, so the source-map build arguments and upload secret are passed there."
+      ]
+    },
+    "realtime": {
+      "version": 2,
+      "commit": "0184a1e1bc4ababa9b89b4455014ba13be436df2",
+      "files": {
+        "centrifugo.json": "centrifugo.json",
+        "scripts/realtime.test.ts": "scripts/realtime.test.ts",
+        "scripts/realtime.ts": "scripts/realtime.ts",
+        "src/client/realtime.test.ts": "src/client/realtime.test.ts",
+        "src/client/realtime.ts": "src/client/realtime.ts",
+        "src/client/useRealtime.test.tsx": "src/client/useRealtime.test.tsx",
+        "src/client/useRealtime.tsx": "src/client/useRealtime.tsx",
+        "src/routes/api/realtime.token.ts": "src/routes/api/realtime.token.ts",
+        "src/server/realtime.test.ts": "src/server/realtime.test.ts",
+        "src/server/realtime.ts": "src/server/realtime.ts",
+        "src/server/realtimePublisher.test.ts": "src/server/realtimePublisher.test.ts",
+        "src/server/realtimePublisher.ts": "src/server/realtimePublisher.ts"
+      },
+      "notes": [
+        "`channelPolicy` in src/server/realtimeChannels.ts is a function of the service's membership check, called in src/server/app.ts, because only a group's members may follow its `group:<id>` channel; there are no server-side channels.",
+        "centrifugo.json keeps the app's `group` namespace with presence and forced join and leave, and its client limits (one channel per connection, 200 connections, five per user); it has no history or recovery because the page refetches on every subscription.",
+        "The group page uses `useConnectedRealtimeClient` from src/client/useLiveGroup.ts, with the subscription and presence handling in its `configure`, instead of `RealtimeProvider`, since only that page listens."
+      ]
+    },
+    "start-app": {
+      "version": 3,
+      "commit": "0184a1e1bc4ababa9b89b4455014ba13be436df2",
+      "files": {
+        "src/client/chunkRecovery.test.ts": "src/client/chunkRecovery.test.ts",
+        "src/client/chunkRecovery.ts": "src/client/chunkRecovery.ts",
+        "src/client/queryClient.test.ts": "src/client/queryClient.test.ts",
+        "src/client/queryClient.ts": "src/client/queryClient.ts",
+        "src/router.tsx": "src/router.tsx",
+        "src/routes/__root.tsx": "src/routes/__root.tsx",
+        "src/routes/api/health.ts": "src/routes/api/health.ts",
+        "src/server/app.test.ts": "src/server/app.test.ts",
+        "src/server/app.ts": "src/server/app.ts",
+        "src/server/health.test.ts": "src/server/health.test.ts",
+        "src/server/health.ts": "src/server/health.ts",
+        "src/server/middleware.test.ts": "src/server/middleware.test.ts",
+        "src/server/middleware.ts": "src/server/middleware.ts",
+        "src/server/origins.test.ts": "src/server/origins.test.ts",
+        "src/server/origins.ts": "src/server/origins.ts",
+        "src/server/rpc.test.ts": "src/server/rpc.test.ts",
+        "src/server/rpc.ts": "src/server/rpc.ts",
+        "src/server/serverFunction.test.ts": "src/server/serverFunction.test.ts",
+        "src/server/serverFunction.ts": "src/server/serverFunction.ts",
+        "src/start.ts": "src/start.ts",
+        "src/styles.css": "src/styles.css",
+        "vite.config.ts": "vite.config.ts"
+      },
+      "notes": [
+        "src/routes/__root.tsx keeps the product's head tags, header, footer, toaster, and `meQuery` loader; the update notice uses the app's brass and floor colours instead of amber.",
+        "src/router.tsx keeps the app's `RouteError` default error component and its 'Nothing here' not-found page.",
+        "src/client/queryClient.ts also exports `errorMessage`, which the pages use to show a failed call's message.",
+        "src/server/contentSecurityPolicy.ts adds `worker-src 'self' blob:` for PostHog session replay's compression worker, as the app's previous policy allowed.",
+        "src/routes/api/health.ts maps a failure to `database_unavailable`, the code monitors already saw.",
+        "vite.config.ts keeps `server.allowedHosts: ['host.docker.internal']` only while the Centrifugo connect proxy calls back into the dev server."
+      ]
+    },
+    "tooling": {
+      "version": 2,
+      "commit": "82fce4523ec914bd2e70aefd4bff84c10fb278c6",
+      "files": {
+        ".gitignore": ".gitignore",
+        ".oxfmtrc.json": ".oxfmtrc.json",
+        ".oxlintrc.json": ".oxlintrc.json",
+        "AGENTS.md": "CLAUDE.md",
+        "package.json": "package.json",
+        "pnpm-workspace.yaml": "pnpm-workspace.yaml",
+        "tsconfig.json": "tsconfig.json",
+        "vitest.config.ts": "vitest.config.ts"
+      },
+      "notes": [
+        "AGENTS.md is a symlink to CLAUDE.md, which holds the recipe's paragraph beside the product's agent guide.",
+        "tsconfig.json keeps the `@/*` path alias and vitest.config.ts sets `resolve.tsconfigPaths`, because the shadcn components under src/components/ui import through `@/`.",
+        ".oxlintrc.json also ignores src/components/ui/**, which `shadcn add` generates.",
+        "pnpm-workspace.yaml keeps the peerDependencyRules entry that lets better-auth's better-sqlite3 peer range accept version 13.",
+        "`pnpm check` also runs `changesets:check`, ras-stack's scripts/checkChangesets.mjs (with the named `getReleasePlan` import @changesets/get-release-plan 5 exports, which lint requires), because the app releases with Changesets."
+      ]
+    }
+  }
+}

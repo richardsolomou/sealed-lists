@@ -1,11 +1,11 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { useAuthAction } from 'ras-stack/auth/react'
+import { useAuthAction } from '../client/useAuthAction'
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { authClient } from '../client/authClient'
+import { authClient } from '../client/auth'
 
 export const Route = createFileRoute('/forgot-password')({
   head: () => ({ meta: [{ title: 'Reset your password — Sealed Lists' }] }),

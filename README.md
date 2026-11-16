@@ -38,7 +38,7 @@ The server stores list text in plain text. A deployment operator with database a
 
 ## Self-hosting 🐳
 
-The only persistent state is `/data`, which contains the SQLite database and generated session secret.
+The only persistent state is `/data`, which contains the SQLite database and the generated realtime secret. Set `BETTER_AUTH_SECRET` in `.env` before the first start.
 
 ```sh
 cp .env.example .env

@@ -9,7 +9,8 @@ on:
 
 concurrency:
   group: preview-${{ github.event.workflow_run.pull_requests[0].number || github.event.pull_request.number }}
-  cancel-in-progress: true
+  # Cancelling mid-deploy can leave Dokploy half-updated and the pull request's preview status stuck on building.
+  cancel-in-progress: false
 
 jobs:
   preview:
@@ -31,8 +32,7 @@ jobs:
       cloudflare-zone-id: 63d29d7bf7e0fd1cdbd18331840244a3
       environment: |
         APP_URL={{PREVIEW_URL}}
-        CENTRIFUGO_API_KEY={{RANDOM_HEX_32}}
-        CENTRIFUGO_PROXY_SECRET={{RANDOM_HEX_32}}
+        BETTER_AUTH_SECRET={{RANDOM_HEX_32}}
       marker: <!-- sealed-lists-preview -->
       note: Preview traffic uses HTTPS through Cloudflare and data resets on every deployment. Create a disposable account with a unique password; never enter real lists or credentials.
     secrets: inherit

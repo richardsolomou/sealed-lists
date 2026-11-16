@@ -10,17 +10,12 @@ install:
 dev:
     #!/usr/bin/env bash
     set -euo pipefail
-    mkdir -p data-dev
-    cleanup() {
-        docker rm --force sealed-lists-realtime >/dev/null 2>&1 || true
-    }
-    trap cleanup EXIT INT TERM
-    cleanup
-    just realtime --detach
-    CENTRIFUGO_API_KEY=dev-api CENTRIFUGO_PROXY_SECRET=dev-api APP_URL=http://localhost:3000 DATA_DIR=./data-dev pnpm dev --host 0.0.0.0
+    pnpm realtime &
+    trap 'kill $!' EXIT INT TERM
+    pnpm dev
 
-realtime *args:
-    pnpm exec ras realtime --config centrifugo.json --name sealed-lists-realtime --port 8000 --origin http://localhost:3000 --secret dev-api --connect-proxy-endpoint http://host.docker.internal:3000/api/centrifugo/connect {{ args }}
+realtime:
+    pnpm realtime
 
 format:
     pnpm format

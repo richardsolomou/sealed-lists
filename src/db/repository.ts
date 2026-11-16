@@ -1,7 +1,7 @@
 import { and, asc, desc, eq, isNotNull, isNull, sql } from 'drizzle-orm'
 import { MEMBERS_MAX, MEMBERS_MIN, allSealed } from '../core/game'
 import type { GroupMember, GroupRecord, EntryRecord, GameRecord } from '../core/game'
-import type { SealedListsDatabase } from './connection'
+import type { AppDatabase } from './database'
 import { groupMembers, groups, emailPreferences, entries, games, user } from './schema'
 
 type Group = { group: GroupRecord; members: GroupMember[] }
@@ -15,13 +15,23 @@ type JoinGameResult = 'joined' | 'locked' | 'already-in' | 'unknown'
 type RemoveMemberResult = 'removed' | 'unknown' | 'too-few'
 
 export class Repository {
-  constructor(private readonly database: SealedListsDatabase) {}
+  constructor(private readonly database: AppDatabase) {}
 
   createGroup(group: { id: string; name: string; token: string; ownerId: string; now: number }) {
     this.database.transaction((tx) => {
       tx.insert(groups).values({ id: group.id, name: group.name, token: group.token, createdAt: group.now }).run()
       tx.insert(groupMembers).values({ groupId: group.id, userId: group.ownerId, joinedAt: group.now }).run()
     })
+  }
+
+  isMember(groupId: string, userId: string) {
+    return (
+      this.database
+        .select({ userId: groupMembers.userId })
+        .from(groupMembers)
+        .where(and(eq(groupMembers.groupId, groupId), eq(groupMembers.userId, userId)))
+        .get() !== undefined
+    )
   }
 
   groupByToken(token: string): Group | undefined {
@@ -283,7 +293,7 @@ export class Repository {
     tx.update(games).set({ revealedAt: now }).where(eq(games.id, gameId)).run()
   }
 
-  private entriesQuery(gameId: string, tx: Transaction | SealedListsDatabase = this.database): EntryRecord[] {
+  private entriesQuery(gameId: string, tx: Transaction | AppDatabase = this.database): EntryRecord[] {
     return tx
       .select({ userId: entries.userId, name: user.name, list: entries.list, draft: entries.draft })
       .from(entries)
@@ -293,7 +303,7 @@ export class Repository {
       .all()
   }
 
-  private membersOf(groupId: string, tx: Transaction | SealedListsDatabase = this.database): GroupMember[] {
+  private membersOf(groupId: string, tx: Transaction | AppDatabase = this.database): GroupMember[] {
     return tx
       .select({ userId: groupMembers.userId, name: user.name })
       .from(groupMembers)
@@ -304,4 +314,4 @@ export class Repository {
   }
 }
 
-type Transaction = Parameters<Parameters<SealedListsDatabase['transaction']>[0]>[0]
+type Transaction = Parameters<Parameters<AppDatabase['transaction']>[0]>[0]
