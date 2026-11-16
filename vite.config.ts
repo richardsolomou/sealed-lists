@@ -1,11 +1,10 @@
-import { defineConfig, loadEnv } from 'vite'
-import path from 'node:path'
-import { tanstackStart } from '@tanstack/react-start/plugin/vite'
 import tailwindcss from '@tailwindcss/vite'
+import { tanstackStart } from '@tanstack/react-start/plugin/vite'
 import viteReact from '@vitejs/plugin-react'
 import { nitro } from 'nitro/vite'
 import { postHogEnvironment } from 'ras-stack/posthog'
 import { postHogIngestProxy } from 'ras-stack/posthog/proxy'
+import { defineConfig, loadEnv } from 'vite'
 import { POSTHOG_INGEST_PATH } from './src/posthog'
 
 export default defineConfig(({ mode }) => {
@@ -13,31 +12,12 @@ export default defineConfig(({ mode }) => {
   const posthog = postHogEnvironment({ projectToken: env.VITE_POSTHOG_PROJECT_TOKEN, host: env.VITE_POSTHOG_HOST })
   const proxy = posthog ? postHogIngestProxy(posthog, { path: POSTHOG_INGEST_PATH }) : undefined
   return {
-    resolve: { alias: { '@': path.resolve(import.meta.dirname, 'src') } },
+    resolve: { tsconfigPaths: true },
     server: {
       allowedHosts: ['host.docker.internal'],
       port: 3000,
       proxy: { '/connection': { target: 'ws://localhost:8000', ws: true }, ...proxy?.vite },
     },
-    plugins: [
-      tanstackStart(),
-      nitro({
-        routeRules: {
-          ...proxy?.nitro,
-          '/**': {
-            headers: {
-              'Content-Security-Policy':
-                "default-src 'self'; script-src 'self' 'unsafe-inline' https://*.posthog.com; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:; connect-src 'self'; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'",
-              'Referrer-Policy': 'no-referrer',
-              'Permissions-Policy': 'camera=(), microphone=(), geolocation=(), payment=()',
-              'X-Content-Type-Options': 'nosniff',
-              'X-Frame-Options': 'DENY',
-            },
-          },
-        },
-      }),
-      viteReact(),
-      tailwindcss(),
-    ],
+    plugins: [tanstackStart(), nitro({ routeRules: { ...proxy?.nitro } }), viteReact(), tailwindcss()],
   }
 })

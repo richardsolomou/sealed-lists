@@ -2,6 +2,7 @@ import type { QueryClient } from '@tanstack/react-query'
 import { useQueryClient, useSuspenseQuery } from '@tanstack/react-query'
 import { HeadContent, Link, Outlet, Scripts, createRootRouteWithContext, useNavigate } from '@tanstack/react-router'
 import { LogOut, User } from 'lucide-react'
+import type { ReactNode } from 'react'
 import '@fontsource-variable/inter'
 import '@fontsource/ibm-plex-mono/400.css'
 import '@fontsource/oswald/500.css'
@@ -12,6 +13,7 @@ import { postHogEnvironment } from 'ras-stack/posthog'
 import { PostHogBetterAuthIdentity, PostHogIntegration } from 'ras-stack/posthog/react'
 import { cn } from '@/lib/utils'
 import { authClient } from '../client/authClient'
+import { chunkRecoveryScript, updateNoticeId } from '../client/chunkRecovery'
 import { meQuery } from '../client/queries'
 import { POSTHOG_INGEST_PATH } from '../posthog'
 import appCss from '../styles.css?url'
@@ -42,14 +44,34 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg' },
       { rel: 'stylesheet', href: appCss },
     ],
+    scripts: [{ children: chunkRecoveryScript }],
   }),
   loader: ({ context }) => context.queryClient.ensureQueryData(meQuery()),
-  component: RootComponent,
+  shellComponent: Document,
+  component: Root,
 })
 
-function RootComponent() {
-  const application = (
-    <>
+// A shell keeps the root's error and not-found pages inside the document, and `Root`'s providers inside the root's error boundary.
+function Document({ children }: { children: ReactNode }) {
+  return (
+    <html lang="en">
+      <head>
+        <HeadContent />
+      </head>
+      <body className="min-h-dvh">
+        <p id={updateNoticeId} hidden className="bg-brass px-4 py-2 text-center text-sm text-floor">
+          A new version is available. Reload the page to continue.
+        </p>
+        {children}
+        <Scripts />
+      </body>
+    </html>
+  )
+}
+
+function Root() {
+  return (
+    <PostHogIntegration environment={posthog} ingestPath={POSTHOG_INGEST_PATH}>
       {posthog && <PostHogBetterAuthIdentity authClient={authClient} />}
       <div className="mx-auto flex min-h-dvh w-full max-w-2xl flex-col px-5">
         <Header />
@@ -66,20 +88,7 @@ function RootComponent() {
         </footer>
       </div>
       <Toaster />
-    </>
-  )
-  return (
-    <html lang="en">
-      <head>
-        <HeadContent />
-      </head>
-      <body className="min-h-dvh">
-        <PostHogIntegration environment={posthog} ingestPath={POSTHOG_INGEST_PATH}>
-          {application}
-        </PostHogIntegration>
-        <Scripts />
-      </body>
-    </html>
+    </PostHogIntegration>
   )
 }
 

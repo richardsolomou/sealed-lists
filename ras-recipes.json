@@ -1,6 +1,42 @@
 {
   "source": "https://github.com/richardsolomou/ras-stack",
   "recipes": {
+    "start-app": {
+      "version": 2,
+      "commit": "82fce4523ec914bd2e70aefd4bff84c10fb278c6",
+      "files": {
+        "src/client/chunkRecovery.test.ts": "src/client/chunkRecovery.test.ts",
+        "src/client/chunkRecovery.ts": "src/client/chunkRecovery.ts",
+        "src/client/queryClient.test.ts": "src/client/queryClient.test.ts",
+        "src/client/queryClient.ts": "src/client/queryClient.ts",
+        "src/router.tsx": "src/router.tsx",
+        "src/routes/__root.tsx": "src/routes/__root.tsx",
+        "src/routes/api/health.ts": "src/routes/api/health.ts",
+        "src/server/app.test.ts": "src/server/app.test.ts",
+        "src/server/app.ts": "src/server/app.ts",
+        "src/server/health.test.ts": "src/server/health.test.ts",
+        "src/server/health.ts": "src/server/health.ts",
+        "src/server/middleware.test.ts": "src/server/middleware.test.ts",
+        "src/server/middleware.ts": "src/server/middleware.ts",
+        "src/server/origins.test.ts": "src/server/origins.test.ts",
+        "src/server/origins.ts": "src/server/origins.ts",
+        "src/server/rpc.test.ts": "src/server/rpc.test.ts",
+        "src/server/rpc.ts": "src/server/rpc.ts",
+        "src/server/serverFunction.test.ts": "src/server/serverFunction.test.ts",
+        "src/server/serverFunction.ts": "src/server/serverFunction.ts",
+        "src/start.ts": "src/start.ts",
+        "src/styles.css": "src/styles.css",
+        "vite.config.ts": "vite.config.ts"
+      },
+      "notes": [
+        "src/routes/__root.tsx keeps the product's head tags, header, footer, toaster, and `meQuery` loader; the update notice uses the app's brass and floor colours instead of amber.",
+        "src/router.tsx keeps the app's `RouteError` default error component and its 'Nothing here' not-found page.",
+        "src/client/queryClient.ts also exports `errorMessage`, which the pages use to show a failed call's message.",
+        "src/server/contentSecurityPolicy.ts adds `worker-src 'self' blob:` for PostHog session replay's compression worker, as the app's previous policy allowed.",
+        "src/routes/api/health.ts maps a failure to `database_unavailable`, the code monitors already saw.",
+        "vite.config.ts keeps `server.allowedHosts: ['host.docker.internal']` only while the Centrifugo connect proxy calls back into the dev server."
+      ]
+    },
     "tooling": {
       "version": 2,
       "commit": "82fce4523ec914bd2e70aefd4bff84c10fb278c6",

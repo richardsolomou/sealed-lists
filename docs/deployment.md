@@ -31,7 +31,7 @@ Lists and games do not expire. Deleting a game or group through the application 
 
 ## Reverse proxy
 
-The reverse proxy must forward `Host`, `X-Forwarded-Host`, and `X-Forwarded-Proto`. Set `APP_URL` when it cannot represent the public origin through those headers.
+Set `APP_URL` to the public origin. Without it, the application trusts `X-Forwarded-Host` and `X-Forwarded-Proto` only when `TRUST_PROXY=true`, which is safe only behind a proxy that replaces both headers.
 
 Forward all traffic to port 3020. The bundled Caddy proxy handles WebSocket upgrades and sends `/connection/*` to Centrifugo without exposing its private HTTP API.
 

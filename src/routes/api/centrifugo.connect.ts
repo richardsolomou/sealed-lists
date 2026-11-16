@@ -3,7 +3,7 @@ import { timingSafeEqual } from 'node:crypto'
 import { z } from 'zod'
 import { groupChannel } from '../../contracts/realtime'
 import { app, requiredEnvironment } from '../../server/app'
-import { requireMutationOrigin } from '../../server/mutationOrigin'
+import { requireSameOrigin } from '../../server/origins'
 import { currentUser } from '../../server/session'
 
 const connectRequest = z.object({ data: z.object({ token: z.string() }) })
@@ -16,7 +16,7 @@ export const Route = createFileRoute('/api/centrifugo/connect')({
       POST: async ({ request }) => {
         if (!hasProxySecret(request)) return disconnect()
         try {
-          requireMutationOrigin(request)
+          requireSameOrigin(request)
         } catch (error) {
           if (error instanceof Response) return disconnect()
           throw error
