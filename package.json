@@ -63,6 +63,7 @@
   },
   "devDependencies": {
     "@changesets/cli": "3.0.0",
+    "@posthog/rollup-plugin": "^1.6.3",
     "@tailwindcss/vite": "^4.3.3",
     "@types/better-sqlite3": "^9.6.0",
     "@types/node": "^26.2.0",

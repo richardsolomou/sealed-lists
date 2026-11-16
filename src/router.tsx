@@ -1,6 +1,7 @@
 import { createRouter } from '@tanstack/react-router'
 import { setupRouterSsrQueryIntegration } from '@tanstack/react-router-ssr-query'
 import { RouteError } from './client/components/RouteError'
+import { captureRenderError } from './client/posthog'
 import { createQueryClient } from './client/queryClient'
 import { routeTree } from './routeTree.gen'
 
@@ -11,6 +12,7 @@ export function getRouter() {
     context: { queryClient },
     defaultPreload: 'intent',
     scrollRestoration: true,
+    defaultOnCatch: captureRenderError,
     defaultErrorComponent: RouteError,
     defaultNotFoundComponent: () => (
       <main className="mx-auto mt-[15vh] max-w-md px-6 text-center">

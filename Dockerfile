@@ -1,4 +1,5 @@
 # syntax=docker/dockerfile:1
+# check=skip=SecretsUsedInArgOrEnv
 FROM node:24-alpine AS build
 WORKDIR /app
 RUN apk add --no-cache python3 make g++
@@ -8,13 +9,14 @@ RUN pnpm fetch --frozen-lockfile
 COPY package.json ./package.json
 RUN pnpm install --offline --frozen-lockfile
 COPY src ./src
+COPY scripts/posthogSourceMaps.ts ./scripts/posthogSourceMaps.ts
 COPY public ./public
 COPY drizzle ./drizzle
 COPY scripts/containerRuntime.ts ./scripts/containerRuntime.ts
 COPY ras-stack.assets.json tsconfig.json vite.config.ts ./
-ARG VITE_POSTHOG_PROJECT_TOKEN
-ARG VITE_POSTHOG_HOST
-RUN VITE_POSTHOG_PROJECT_TOKEN=$VITE_POSTHOG_PROJECT_TOKEN VITE_POSTHOG_HOST=$VITE_POSTHOG_HOST pnpm build
+# The PostHog project token is public, since it ships in the browser bundle; the upload key arrives as a secret instead.
+ARG VITE_POSTHOG_PROJECT_TOKEN VITE_POSTHOG_HOST POSTHOG_UPLOAD_SOURCEMAPS POSTHOG_CLI_PROJECT_ID POSTHOG_CLI_HOST
+RUN --mount=type=secret,id=posthog_cli_api_key,env=POSTHOG_CLI_API_KEY pnpm build
 
 FROM ghcr.io/richardsolomou/ras-stack-runtime-binaries:runtime-v1.0.4@sha256:183261400ef822d3dfb7ae9391dc3836d343e01de41ab131df6a42751f87288e AS runtime-binaries
 

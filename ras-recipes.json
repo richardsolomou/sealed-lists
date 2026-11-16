@@ -1,6 +1,25 @@
 {
   "source": "https://github.com/richardsolomou/ras-stack",
   "recipes": {
+    "posthog-web": {
+      "version": 2,
+      "commit": "82fce4523ec914bd2e70aefd4bff84c10fb278c6",
+      "files": {
+        "scripts/posthogSourceMaps.test.ts": "scripts/posthogSourceMaps.test.ts",
+        "scripts/posthogSourceMaps.ts": "scripts/posthogSourceMaps.ts",
+        "src/client/posthog.test.tsx": "src/client/posthog.test.tsx",
+        "src/client/posthog.tsx": "src/client/posthog.tsx",
+        "src/contracts/posthog.test.ts": "src/contracts/posthog.test.ts",
+        "src/contracts/posthog.ts": "src/contracts/posthog.ts",
+        "src/routes/t/$.ts": "src/routes/t/$.ts",
+        "src/server/posthogProxy.test.ts": "src/server/posthogProxy.test.ts",
+        "src/server/posthogProxy.ts": "src/server/posthogProxy.ts"
+      },
+      "notes": [
+        "Production images are built by the `production-image` job in .github/workflows/ci.yml after a Changesets release, not by deploy.yml, so the source-map build arguments and upload secret are passed there.",
+        "The root route renders the identity component only when `bundledPostHog` is set, matching the app's earlier behaviour."
+      ]
+    },
     "start-app": {
       "version": 2,
       "commit": "82fce4523ec914bd2e70aefd4bff84c10fb278c6",
