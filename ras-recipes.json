@@ -28,6 +28,17 @@
         "The sign-in, forgot-password, and reset-password pages are the product's own (src/routes/signin.tsx and siblings) and keep controlled inputs."
       ]
     },
+    "ci": {
+      "version": 1,
+      "commit": "ec2a7bdc97f8534e2fe0d9a0581b3b1898e05327",
+      "files": {
+        ".github/dependabot.yml": ".github/dependabot.yml",
+        ".github/workflows/ci.yml": ".github/workflows/ci.yml"
+      },
+      "notes": [
+        "ci.yml keeps three jobs beyond `check`: `image`, which builds the Dockerfile on every pull request; `release`, which runs the shared Changesets release workflow on `main`; and `production-image`, which publishes and deploys each release (see deploy-dokploy's notes)."
+      ]
+    },
     "database-sqlite": {
       "version": 1,
       "commit": "82fce4523ec914bd2e70aefd4bff84c10fb278c6",
