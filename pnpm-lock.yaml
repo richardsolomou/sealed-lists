@@ -34,7 +34,7 @@ importers:
         version: 0.223.1(@opentelemetry/api@1.9.1)
       '@posthog/react':
         specifier: ^1.11.3
-        version: 1.11.3(@types/react@19.3.0)(posthog-js@1.434.15(@types/react@19.3.0)(react@19.3.1))(react@19.3.1)
+        version: 1.11.3(@types/react@19.3.0)(posthog-js@1.450.0(@types/react@19.3.0)(react@19.3.1))(react@19.3.1)
       '@tanstack/react-query':
         specifier: ^5.107.1
         version: 5.107.1(@types/react@19.3.0)(react@19.3.1)
@@ -75,8 +75,8 @@ importers:
         specifier: ^10.4.0
         version: 10.4.0
       posthog-js:
-        specifier: ^1.430.3
-        version: 1.434.15(@types/react@19.3.0)(react@19.3.1)
+        specifier: ^1.450.0
+        version: 1.450.0(@types/react@19.3.0)(react@19.3.1)
       posthog-node:
         specifier: ^5.74.0
         version: 5.74.0(@opentelemetry/api@1.9.1)
@@ -103,8 +103,8 @@ importers:
         specifier: ^5.0.2
         version: 5.0.2
       '@posthog/rollup-plugin':
-        specifier: ^1.6.3
-        version: 1.6.3(rollup@4.68.2)
+        specifier: ^1.6.4
+        version: 1.6.4(rollup@4.68.2)
       '@tailwindcss/vite':
         specifier: ^4.3.5
         version: 4.3.5(vite@8.2.1(@types/node@26.2.0)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.12)(yaml@2.9.0))
@@ -1015,9 +1015,6 @@ packages:
     resolution: {integrity: sha512-bRISgCIjP20/tbWSPWMEi54QVPRZExkuD9lJL+UIxUKtwVJA8wW1Trb1jMs1RFXo1CBTNZ/5hpC9QvmKWdopKw==}
     engines: {node: '>=6.0.0'}
 
-  '@jridgewell/sourcemap-codec@1.5.5':
-    resolution: {integrity: sha512-cYQ9310grqxueWbl+WuIUIaiUaDcj7WOq5fVhEljNVgRfOUhY9fy2zTvfoqWsnebh8Sl70VScFbICvJnLKB0Og==}
-
   '@jridgewell/sourcemap-codec@1.6.0':
     resolution: {integrity: sha512-T7jf+5zgsZHwNJ4lvQ7/aezbyk0nNX+zJVWpmHA7VYsEx7a7qr5Rg5IbtJFqkgze5Y2sruq1RUY8Q837Od7iFw==}
 
@@ -1433,16 +1430,13 @@ packages:
     resolution: {integrity: sha512-pOr5+q1fLYKwFN3LAJuGZEnfXDcQ73zqgDHMtGy+K+uIoUqyY+6MeDCWFwfu+4EFuq76I5EPFofoNAI+Bmmq4A==}
     engines: {node: '>=22.13'}
 
-  '@posthog/browser-common@0.9.0':
-    resolution: {integrity: sha512-EWoVzs1vVY7ihpn8yOjj3jyjriHUEEMVSBNL/TW3hk09fTriWRe76vJXrRg0G0yjTYxHmtlSkNn4mOV24ZEzzA==}
+  '@posthog/browser-common@0.12.0':
+    resolution: {integrity: sha512-P1CubrDp1xwYi2DQxjzJITEeMJpZ7qYcbHuhtXLHgkG8bE6gLy0JwkykjRtEFbElvJNbHQO1jQi7Cbb3JyazNw==}
 
-  '@posthog/cli@0.18.12':
-    resolution: {integrity: sha512-/eT9riWOkBb9uwsdOxQgW3fan/T3hwT8rvwZCzPl3DAgSBEhzpP59usD0fyFS++X2967E5AQe74nrBw1rywf6A==}
+  '@posthog/cli@0.19.4':
+    resolution: {integrity: sha512-wDS1yNMfKYEVpWJNX0DVdmQA9//zQV6+I7Eq2NcgRL30g2TKzN/wAzob0iAI/ysibcON7D6o/LtBxfh+8JTGDw==}
     engines: {node: '>=14.14', npm: '>=6'}
     hasBin: true
-
-  '@posthog/core@1.55.2':
-    resolution: {integrity: sha512-2mYxGbDmTLUs096VbcZqSWo0lrI48/BrX65r54NynxxFq409BOx9w73HxOAtOKZ1vblkdV6/GxQTe7KDcIQidg==}
 
   '@posthog/core@1.68.0':
     resolution: {integrity: sha512-5kjPcLquzj47qBGn52+7RRXrJJvrTHaRKgxV9izYPFzoVFEftFqSXYZF/ug+yialxDU73dR9apyi+mSaAeaXPw==}
@@ -1460,13 +1454,10 @@ packages:
       '@types/react':
         optional: true
 
-  '@posthog/rollup-plugin@1.6.3':
-    resolution: {integrity: sha512-Z+S78boVxU9I/FthoJLi1Ql743WL9QMn/UK+kUNadHbTzlB9BHN37aLjBWGYWi56RrOTjfAWtb5j8l8TVzEQXg==}
+  '@posthog/rollup-plugin@1.6.4':
+    resolution: {integrity: sha512-T2BnNw9wqodg+Xx75Aq7Nm0wtHanvD4amlc1KJnJ/oTE76bN3okl+Cwm30WvoGSVFnrzumDYF2lrsJejplCmgw==}
     peerDependencies:
       rollup: '>= 4.0.0'
-
-  '@posthog/types@1.412.4':
-    resolution: {integrity: sha512-Q7lV9O9TbLngjOYw1ucm3bS3tn48xb1B4ZQdDy8gv7yfKe99hCTeWYG4xZ36nJM80VxpTF9TriiJt5hngDOkBg==}
 
   '@posthog/types@1.425.1':
     resolution: {integrity: sha512-mh7jyQ5lN+XCeOnMdYkBEFtO/G0TxeLOKTWNH6E6OZjxS4nVM0Tb2xQt+FG5DCFM9qzL2HmuX6A793TwlJVDvw==}
@@ -3624,8 +3615,8 @@ packages:
     resolution: {integrity: sha512-u82N74LFzG8ca+dD8puPnplTXoGH4fTPpVGuIbt36G3qvNlkvfD0lEAZSxaly3KX8TS/L1A1gsCEmvKmBcVbkQ==}
     engines: {node: ^10 || ^12 || >=14}
 
-  posthog-js@1.434.15:
-    resolution: {integrity: sha512-ZfBkNrQiFr1Q43G3dR0USzTRdfx+6gKPebyoWDmKnLUhG3yRgYjLH914J6ifEDRnH+RaGOx7rsWKxKcvaSJXHg==}
+  posthog-js@1.450.0:
+    resolution: {integrity: sha512-KsjBOy0At8HFm8aYIb3zZ+0oYdOeAMCDkGcvM4po/N08K+nyvFNJgqHL2DzyVXkN0FiB6lvdWzjbZk7QQbxJCQ==}
     peerDependencies:
       '@types/react': '>=16.8.0'
       react: '>=16.8.0'
@@ -5008,7 +4999,7 @@ snapshots:
 
   '@jridgewell/gen-mapping@0.3.13':
     dependencies:
-      '@jridgewell/sourcemap-codec': 1.5.5
+      '@jridgewell/sourcemap-codec': 1.6.0
       '@jridgewell/trace-mapping': 0.3.31
 
   '@jridgewell/remapping@2.3.5':
@@ -5018,14 +5009,12 @@ snapshots:
 
   '@jridgewell/resolve-uri@3.1.2': {}
 
-  '@jridgewell/sourcemap-codec@1.5.5': {}
-
   '@jridgewell/sourcemap-codec@1.6.0': {}
 
   '@jridgewell/trace-mapping@0.3.31':
     dependencies:
       '@jridgewell/resolve-uri': 3.1.2
-      '@jridgewell/sourcemap-codec': 1.5.5
+      '@jridgewell/sourcemap-codec': 1.6.0
 
   '@manypkg/find-root@3.1.0':
     dependencies:
@@ -5305,18 +5294,18 @@ snapshots:
 
   '@pnpm/deps.graph-sequencer@1100.0.1': {}
 
-  '@posthog/browser-common@0.9.0':
+  '@posthog/browser-common@0.12.0':
     dependencies:
-      '@posthog/core': 1.55.2
-      '@posthog/types': 1.412.4
+      '@posthog/core': 1.68.0
+      '@posthog/types': 1.425.1
+      dompurify: 3.4.13
+      preact: 10.29.8
+    transitivePeerDependencies:
+      - preact-render-to-string
 
-  '@posthog/cli@0.18.12':
+  '@posthog/cli@0.19.4':
     dependencies:
       detect-libc: 2.1.2
-
-  '@posthog/core@1.55.2':
-    dependencies:
-      '@posthog/types': 1.412.4
 
   '@posthog/core@1.68.0':
     dependencies:
@@ -5326,21 +5315,19 @@ snapshots:
     dependencies:
       cross-spawn: 7.0.6
 
-  '@posthog/react@1.11.3(@types/react@19.3.0)(posthog-js@1.434.15(@types/react@19.3.0)(react@19.3.1))(react@19.3.1)':
+  '@posthog/react@1.11.3(@types/react@19.3.0)(posthog-js@1.450.0(@types/react@19.3.0)(react@19.3.1))(react@19.3.1)':
     dependencies:
-      posthog-js: 1.434.15(@types/react@19.3.0)(react@19.3.1)
+      posthog-js: 1.450.0(@types/react@19.3.0)(react@19.3.1)
       react: 19.3.1
     optionalDependencies:
       '@types/react': 19.3.0
 
-  '@posthog/rollup-plugin@1.6.3(rollup@4.68.2)':
+  '@posthog/rollup-plugin@1.6.4(rollup@4.68.2)':
     dependencies:
-      '@posthog/cli': 0.18.12
+      '@posthog/cli': 0.19.4
       '@posthog/plugin-utils': 2.0.1
       magic-string: 0.30.21
       rollup: 4.68.2
-
-  '@posthog/types@1.412.4': {}
 
   '@posthog/types@1.425.1': {}
 
@@ -6888,7 +6875,7 @@ snapshots:
 
   magic-string@0.30.21:
     dependencies:
-      '@jridgewell/sourcemap-codec': 1.5.5
+      '@jridgewell/sourcemap-codec': 1.6.0
 
   magic-string@1.4.5:
     dependencies:
@@ -7146,11 +7133,11 @@ snapshots:
       picocolors: 1.1.1
       source-map-js: 1.2.1
 
-  posthog-js@1.434.15(@types/react@19.3.0)(react@19.3.1):
+  posthog-js@1.450.0(@types/react@19.3.0)(react@19.3.1):
     dependencies:
-      '@posthog/browser-common': 0.9.0
-      '@posthog/core': 1.55.2
-      '@posthog/types': 1.412.4
+      '@posthog/browser-common': 0.12.0
+      '@posthog/core': 1.68.0
+      '@posthog/types': 1.425.1
       core-js: 3.50.0
       dompurify: 3.4.13
       fflate: 0.4.9
