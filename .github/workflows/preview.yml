@@ -24,6 +24,7 @@ jobs:
       subdomain-prefix: sealed-lists-pr
       marker: <!-- sealed-lists-preview -->
       note: Preview traffic uses HTTPS through Cloudflare and data resets on every deployment. Create a disposable account with a unique password; never enter real lists or credentials.
+      platform: linux/arm64
       cache-scope: sealed-lists-preview
       build-args: |
         VITE_POSTHOG_PROJECT_TOKEN=${{ vars.VITE_POSTHOG_PROJECT_TOKEN }}

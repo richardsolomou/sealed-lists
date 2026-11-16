@@ -10,7 +10,18 @@ export default defineConfig(({ mode }) => {
   return {
     resolve: { tsconfigPaths: true },
     server: { port: 3000, proxy: { '/connection': { target: 'ws://127.0.0.1:8000', ws: true } } },
-    plugins: [tanstackStart(), nitro(), viteReact(), tailwindcss(), sourceMaps?.client],
+    plugins: [
+      tanstackStart(),
+      nitro({
+        preset: 'node-server',
+        plugins: ['./src/server/shutdown.ts'],
+        // The server bundle inlines React Query, whose `'use client'` directives mean nothing on the server.
+        rolldownConfig: { checks: { moduleLevelDirective: false } },
+      }),
+      viteReact(),
+      tailwindcss(),
+      sourceMaps?.client,
+    ],
     ...(sourceMaps ? { worker: { plugins: () => [sourceMaps.worker()] } } : {}),
   }
 })

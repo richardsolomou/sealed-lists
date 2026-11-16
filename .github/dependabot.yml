@@ -34,3 +34,15 @@ updates:
       - dependency-name: richardsolomou/ras-stack*
         update-types:
           - version-update:semver-major
+  - package-ecosystem: docker
+    directory: /
+    schedule:
+      interval: weekly
+    cooldown:
+      default-days: 7
+      exclude:
+        - '*ras-stack-runtime-binaries'
+    ignore:
+      - dependency-name: node
+        update-types:
+          - version-update:semver-major

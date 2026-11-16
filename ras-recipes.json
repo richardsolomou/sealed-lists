@@ -46,6 +46,26 @@
         "package.json keeps `db:check` (`drizzle-kit check`) in `pnpm check`."
       ]
     },
+    "deploy-dokploy": {
+      "version": 1,
+      "commit": "ec2a7bdc97f8534e2fe0d9a0581b3b1898e05327",
+      "files": {
+        ".dockerignore": ".dockerignore",
+        ".github/workflows/deploy.yml": null,
+        ".github/workflows/preview-deploy.yml": ".github/workflows/preview-deploy.yml",
+        ".github/workflows/preview-prune.yml": ".github/workflows/preview-prune.yml",
+        ".github/workflows/preview.yml": ".github/workflows/preview.yml",
+        "Dockerfile": "Dockerfile",
+        "src/server/shutdown.test.ts": "src/server/shutdown.test.ts",
+        "src/server/shutdown.ts": "src/server/shutdown.ts"
+      },
+      "notes": [
+        "No .github/workflows/deploy.yml: production images are published and deployed by the `production-image` job in .github/workflows/ci.yml after a Changesets release, gated by the `DOKPLOY_IMAGE_DEPLOY` variable, with the recipe's arm64 runner, platform, attestation, environment, and GHCR pull settings.",
+        "The Dockerfile keeps the app's OCI labels and copies LICENSE into the image, as the AGPL source notice.",
+        "The preview workflows keep the `ras.sh` Cloudflare zone id inline rather than reading `vars.CLOUDFLARE_ZONE_ID`, and the prune job keeps its own cron minute.",
+        "The preview note keeps the app's wording about creating a disposable account."
+      ]
+    },
     "email-smtp": {
       "version": 1,
       "commit": "82fce4523ec914bd2e70aefd4bff84c10fb278c6",
