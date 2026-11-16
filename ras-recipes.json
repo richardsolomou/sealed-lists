@@ -40,18 +40,19 @@
       ]
     },
     "database-sqlite": {
-      "version": 1,
-      "commit": "82fce4523ec914bd2e70aefd4bff84c10fb278c6",
+      "version": 2,
+      "commit": "0184a1e1bc4ababa9b89b4455014ba13be436df2",
       "files": {
         "drizzle.config.ts": "drizzle.config.ts",
         "scripts/database.test.ts": "scripts/database.test.ts",
         "scripts/database.ts": "scripts/database.ts",
+        "scripts/databaseFile.ts": "scripts/databaseFile.ts",
         "src/db/database.test.ts": "src/db/database.test.ts",
         "src/db/database.ts": "src/db/database.ts",
         "src/server/database.test.ts": "src/server/database.test.ts"
       },
       "notes": [
-        "The database file is `$DATA_DIR/sealed-lists.sqlite`, the name deployments already have, in src/db/database.ts, scripts/database.ts, and their tests.",
+        "`databaseFileName` in scripts/databaseFile.ts is `sealed-lists.sqlite`, the name deployments already have.",
         "src/db/schema.ts and drizzle/ are the application's own, with its existing migration history; the recipe's starter `note` table and `0000_init` migration were not used.",
         "src/server/database.test.ts writes a `groups` row instead of the starter `note` table.",
         "package.json keeps `db:check` (`drizzle-kit check`) in `pnpm check`."
