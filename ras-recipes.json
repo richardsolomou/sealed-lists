@@ -207,7 +207,8 @@
         "AGENTS.md is a symlink to CLAUDE.md, which holds the recipe's paragraph beside the product's agent guide.",
         "tsconfig.json keeps the `@/*` path alias and vitest.config.ts sets `resolve.tsconfigPaths`, because the shadcn components under src/components/ui import through `@/`.",
         ".oxlintrc.json also ignores src/components/ui/**, which `shadcn add` generates.",
-        "pnpm-workspace.yaml keeps the peerDependencyRules entry that lets better-auth's better-sqlite3 peer range accept version 13."
+        "pnpm-workspace.yaml keeps the peerDependencyRules entry that lets better-auth's better-sqlite3 peer range accept version 13.",
+        "`pnpm check` also runs `changesets:check`, ras-stack's scripts/checkChangesets.mjs (with the named `getReleasePlan` import @changesets/get-release-plan 5 exports, which lint requires), because the app releases with Changesets."
       ]
     }
   }

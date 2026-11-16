@@ -1,5 +1,5 @@
 {
-  "extends": "./node_modules/ras-stack-config/config/typescript/tanstack.json",
+  "extends": "./node_modules/ras-stack/config/typescript/vite.json",
   "compilerOptions": {
     "allowImportingTsExtensions": true,
     "paths": {

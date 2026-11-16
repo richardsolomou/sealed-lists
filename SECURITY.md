@@ -10,4 +10,4 @@ Include the affected revision, deployment setup, reproduction steps, impact, and
 
 ## Supported versions
 
-Security fixes are made against the latest revision on `main`. Back up the SQLite database and its matching `/data/auth.secret` before upgrading. If `AUTH_SECRET` is configured explicitly, back that value up instead. Before reporting a problem, update to the latest revision and check whether it still occurs.
+Security fixes are made against the latest revision on `main`. Back up the SQLite database and the session secret before upgrading: `BETTER_AUTH_SECRET`, or on older deployments `AUTH_SECRET` or `/data/auth.secret`. Before reporting a problem, update to the latest revision and check whether it still occurs.
