@@ -1,13 +1,13 @@
 import { beforeEach, describe, expect, it } from 'vitest'
 import type { RealtimePublisher } from '../adapters/centrifugo'
 import { normalizeList } from '../core/game'
-import { openDatabase, type SealedListsDatabase } from '../db/connection'
+import { openDatabase, type AppDatabase } from '../db/database'
 import { Repository } from '../db/repository'
 import { user } from '../db/schema'
 import { SealedListsService } from './service'
 import type { Notifier } from './notify'
 
-let database: SealedListsDatabase
+let database: AppDatabase
 let service: SealedListsService
 let notified: string[]
 let changed: string[]

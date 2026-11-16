@@ -13,7 +13,7 @@ COPY scripts/posthogSourceMaps.ts ./scripts/posthogSourceMaps.ts
 COPY public ./public
 COPY drizzle ./drizzle
 COPY scripts/containerRuntime.ts ./scripts/containerRuntime.ts
-COPY ras-stack.assets.json tsconfig.json vite.config.ts ./
+COPY tsconfig.json vite.config.ts ./
 # The PostHog project token is public, since it ships in the browser bundle; the upload key arrives as a secret instead.
 ARG VITE_POSTHOG_PROJECT_TOKEN VITE_POSTHOG_HOST POSTHOG_UPLOAD_SOURCEMAPS POSTHOG_CLI_PROJECT_ID POSTHOG_CLI_HOST
 RUN --mount=type=secret,id=posthog_cli_api_key,env=POSTHOG_CLI_API_KEY pnpm build
@@ -28,6 +28,8 @@ LABEL org.opencontainers.image.title="Sealed Lists" \
 WORKDIR /app
 RUN apk add --no-cache tini && mkdir -p /data && chown -R node:node /app /data
 COPY --from=build --chown=node:node /app/.output ./.output
+COPY --from=build --chown=node:node /app/drizzle ./drizzle
+COPY --chown=node:node scripts/database.ts ./.output/server/database.ts
 COPY --from=runtime-binaries /usr/local/bin/centrifugo /usr/local/bin/centrifugo
 COPY --from=runtime-binaries /usr/local/bin/caddy /usr/local/bin/caddy
 COPY --chown=node:node centrifugo.json ./centrifugo.json

@@ -151,5 +151,3 @@ export const entries = sqliteTable(
   },
   (table) => [primaryKey({ columns: [table.gameId, table.userId] })],
 )
-
-export const schema = { user, session, account, verification, rateLimit, groups, groupMembers, games, entries, emailPreferences }

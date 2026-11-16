@@ -3,14 +3,14 @@ import { drizzleAdapter } from 'better-auth/adapters/drizzle'
 import { configuredProviderOptions, standardRateLimitOptions, standardSessionOptions, trustedOrigins } from 'ras-stack/auth'
 import { PASSWORD_MIN_LENGTH } from '../core/game'
 import type { EmailDelivery } from '../adapters/email'
-import type { SealedListsDatabase } from '../db/connection'
-import { schema } from '../db/schema'
+import type { AppDatabase } from '../db/database'
+import * as schema from '../db/schema'
 import { resetPasswordEmail, verifyEmail } from './emails'
 
 export const SOCIAL_PROVIDERS = ['google', 'discord'] as const
 export type SocialProvider = (typeof SOCIAL_PROVIDERS)[number]
 
-export function createAuth(database: SealedListsDatabase, secret: string, email: EmailDelivery) {
+export function createAuth(database: AppDatabase, secret: string, email: EmailDelivery) {
   return betterAuth({
     database: drizzleAdapter(database, { provider: 'sqlite', schema }),
     secret,

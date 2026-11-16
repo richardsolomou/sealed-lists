@@ -1,6 +1,24 @@
 {
   "source": "https://github.com/richardsolomou/ras-stack",
   "recipes": {
+    "database-sqlite": {
+      "version": 1,
+      "commit": "82fce4523ec914bd2e70aefd4bff84c10fb278c6",
+      "files": {
+        "drizzle.config.ts": "drizzle.config.ts",
+        "scripts/database.test.ts": "scripts/database.test.ts",
+        "scripts/database.ts": "scripts/database.ts",
+        "src/db/database.test.ts": "src/db/database.test.ts",
+        "src/db/database.ts": "src/db/database.ts",
+        "src/server/database.test.ts": "src/server/database.test.ts"
+      },
+      "notes": [
+        "The database file is `$DATA_DIR/sealed-lists.sqlite`, the name deployments already have, in src/db/database.ts, scripts/database.ts, and their tests.",
+        "src/db/schema.ts and drizzle/ are the application's own, with its existing migration history; the recipe's starter `note` table and `0000_init` migration were not used.",
+        "src/server/database.test.ts writes a `groups` row instead of the starter `note` table.",
+        "package.json keeps `db:check` (`drizzle-kit check`) in `pnpm check`."
+      ]
+    },
     "posthog-server": {
       "version": 2,
       "commit": "82fce4523ec914bd2e70aefd4bff84c10fb278c6",

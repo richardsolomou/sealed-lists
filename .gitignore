@@ -11,3 +11,4 @@ data-dev/
 .pnpm-store/
 .DS_Store
 .claude/settings.local.json
+.data/

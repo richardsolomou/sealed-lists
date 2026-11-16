@@ -4,7 +4,7 @@ import path from 'node:path'
 import { persistedSecret } from 'ras-stack/auth'
 import { buildEmailDelivery } from '../adapters/email'
 import { createCentrifugoPublisher } from '../adapters/centrifugo'
-import { closeDatabase, databasePath, openDatabase } from '../db/connection'
+import { databaseFile, openDatabase } from '../db/database'
 import { Repository } from '../db/repository'
 import { createAuth } from './auth'
 import { buildNotifier } from './notify'
@@ -33,8 +33,10 @@ function createApp() {
   try {
     // First, so it closes last and records the others closing.
     const telemetry = resources.adopt(createTelemetry(), (created) => created.shutdown())
-    const file = databasePath()
-    const database = resources.adopt(openDatabase(file), closeDatabase)
+    const file = databaseFile()
+    const database = resources.adopt(openDatabase(file), (db) => {
+      db.$client.close()
+    })
     const repository = new Repository(database)
     const email = buildEmailDelivery()
     const realtime = resources.adopt(
