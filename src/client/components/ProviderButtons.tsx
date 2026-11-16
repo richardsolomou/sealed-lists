@@ -1,4 +1,4 @@
-import { authClient } from '../authClient'
+import { authClient } from '../auth'
 import type { signInOptions } from '../../server/fns'
 
 type SocialProvider = Awaited<ReturnType<typeof signInOptions>>['providers'][number]

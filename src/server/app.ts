@@ -1,10 +1,10 @@
 /// <reference lib="esnext.disposable" />
 
-import path from 'node:path'
-import { persistedSecret } from 'ras-stack/auth'
+import { drizzleAdapter } from 'better-auth/adapters/drizzle'
 import { emailDelivery } from '../adapters/email'
 import { createCentrifugoPublisher } from '../adapters/centrifugo'
 import { databaseFile, openDatabase } from '../db/database'
+import * as schema from '../db/schema'
 import { Repository } from '../db/repository'
 import { createAuth } from './auth'
 import { buildNotifier } from './notify'
@@ -33,8 +33,7 @@ function createApp() {
   try {
     // First, so it closes last and records the others closing.
     const telemetry = resources.adopt(createTelemetry(), (created) => created.shutdown())
-    const file = databaseFile()
-    const database = resources.adopt(openDatabase(file), (db) => {
+    const database = resources.adopt(openDatabase(databaseFile()), (db) => {
       db.$client.close()
     })
     const repository = new Repository(database)
@@ -47,7 +46,8 @@ function createApp() {
       (publisher) => publisher.close(),
     )
     const service = new SealedListsService(repository, Date.now, buildNotifier(repository, email, appUrl), realtime)
-    const auth = createAuth(database, persistedSecret({ directory: path.dirname(file) }), email)
+    // better-sqlite3 transactions are synchronous and Better Auth's are not, so the adapter's `transaction` option stays off.
+    const auth = createAuth(drizzleAdapter(database, { provider: 'sqlite', schema }), email)
     return { telemetry, database, service, realtime, auth, emailConfigured: Boolean(email), close: () => resources.disposeAsync() }
   } catch (error) {
     disposeInBackground(resources)

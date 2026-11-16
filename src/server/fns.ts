@@ -1,8 +1,7 @@
 import { createServerFn } from '@tanstack/react-start'
-import { configuredProviders } from 'ras-stack/auth'
 import { z } from 'zod'
 import { app } from './app'
-import { SOCIAL_PROVIDERS } from './auth'
+import { SOCIAL_PROVIDERS, socialProviders } from './auth'
 import { mutationRpc, rpc } from './rpc'
 import { createGroupSchema, gameSchema, memberSchema, saveDraftSchema, sealListSchema, startGameSchema, tokenSchema } from './schemas'
 import { currentUser, requireUser } from './session'
@@ -17,11 +16,20 @@ function orNull<T>(work: () => T) {
   }
 }
 
-export const me = createServerFn({ method: 'GET' }).handler(() => rpc(() => currentUser()))
+/** Only what the pages show, not the whole account record. */
+export const me = createServerFn({ method: 'GET' }).handler(() =>
+  rpc(async () => {
+    const user = await currentUser()
+    return user && { id: user.id, name: user.name, email: user.email }
+  }),
+)
 
 /** The sign-in page only offers what the deployment has credentials for. */
 export const signInOptions = createServerFn({ method: 'GET' }).handler(() =>
-  rpc(() => ({ providers: configuredProviders(SOCIAL_PROVIDERS), emailConfigured: app().emailConfigured })),
+  rpc(() => {
+    const configured = socialProviders()
+    return { providers: SOCIAL_PROVIDERS.filter((provider) => configured[provider]), emailConfigured: app().emailConfigured }
+  }),
 )
 
 export const emailPreference = createServerFn({ method: 'GET' }).handler(() =>

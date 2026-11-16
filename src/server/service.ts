@@ -1,5 +1,5 @@
 import type { RealtimePublisher } from '../adapters/centrifugo'
-import { randomId, randomToken } from 'ras-stack/auth'
+import { randomId, randomToken } from './random'
 import { LIST_MAX_LENGTH, MEMBERS_MAX, PLAYERS_MIN, gameView, normalizeList } from '../core/game'
 import type { GroupSummary, GroupView, GameView } from '../core/game'
 import type { Repository } from '../db/repository'

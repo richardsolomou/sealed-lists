@@ -11,7 +11,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Toaster } from '@/components/ui/sonner'
 import { PostHogBetterAuthIdentity } from 'ras-stack/posthog/react'
 import { cn } from '@/lib/utils'
-import { authClient } from '../client/authClient'
+import { authClient } from '../client/auth'
 import { chunkRecoveryScript, updateNoticeId } from '../client/chunkRecovery'
 import { meQuery } from '../client/queries'
 import { PostHogIntegration } from '../client/posthog'

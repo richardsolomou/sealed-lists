@@ -15,7 +15,7 @@ The image health check reaches the application through the bundled Caddy proxy. 
 
 ## Dokploy
 
-Releases publish `ghcr.io/richardsolomou/sealed-lists:latest`, a version tag, and an immutable `sha-<commit>` tag. Create an Application that uses the published image rather than rebuilding the repository. Mount a persistent volume at `/data`, then set `APP_URL`, `AUTH_SECRET`, `CENTRIFUGO_API_KEY`, and `CENTRIFUGO_PROXY_SECRET`. Generate a different random value for each secret.
+Releases publish `ghcr.io/richardsolomou/sealed-lists:latest`, a version tag, and an immutable `sha-<commit>` tag. Create an Application that uses the published image rather than rebuilding the repository. Mount a persistent volume at `/data`, then set `APP_URL`, `BETTER_AUTH_SECRET`, `CENTRIFUGO_API_KEY`, and `CENTRIFUGO_PROXY_SECRET`. Generate a different random value for each secret.
 
 To deploy releases from GitHub Actions, add `DOKPLOY_URL`, `DOKPLOY_API_KEY`, and `DOKPLOY_APPLICATION_ID` as repository secrets. Leave the `DOKPLOY_IMAGE_DEPLOY` repository variable unset for the first release so GitHub can create the package, make `ghcr.io/richardsolomou/sealed-lists` public in its package settings, then set the variable to `true`. The release workflow resolves the commit tag to its manifest digest, records the exact reference in the job summary, switches Dokploy to the image provider, and deploys it. Image publication does not depend on Dokploy.
 
@@ -25,7 +25,7 @@ Pull request installations belong in a separate staging environment. See [Pull r
 
 ## Persistent data
 
-`/data` contains the SQLite database and the generated `auth.secret` used to sign sessions. Back up both together. Set `AUTH_SECRET` explicitly if the deployment manages secrets elsewhere; changing it signs every account out.
+`/data` contains the SQLite database, `sealed-lists.sqlite`. `BETTER_AUTH_SECRET` signs sessions and is required in production; changing it signs every account out. A deployment that set `AUTH_SECRET`, or that relied on the `auth.secret` file earlier releases generated in `/data`, keeps using that secret while `BETTER_AUTH_SECRET` is unset. To move to `BETTER_AUTH_SECRET`, copy the existing value into it unchanged, then remove the old variable; back up `auth.secret` with the database until then.
 
 Lists and games do not expire. Deleting a game or group through the application is the only automatic removal of its list data.
 

@@ -31,6 +31,7 @@ jobs:
       cloudflare-zone-id: 63d29d7bf7e0fd1cdbd18331840244a3
       environment: |
         APP_URL={{PREVIEW_URL}}
+        BETTER_AUTH_SECRET={{RANDOM_HEX_32}}
         CENTRIFUGO_API_KEY={{RANDOM_HEX_32}}
         CENTRIFUGO_PROXY_SECRET={{RANDOM_HEX_32}}
       marker: <!-- sealed-lists-preview -->

@@ -1,6 +1,33 @@
 {
   "source": "https://github.com/richardsolomou/ras-stack",
   "recipes": {
+    "auth": {
+      "version": 1,
+      "commit": "82fce4523ec914bd2e70aefd4bff84c10fb278c6",
+      "files": {
+        "src/client/auth.ts": "src/client/auth.ts",
+        "src/client/authFailures.test.ts": "src/client/authFailures.test.ts",
+        "src/client/authFailures.ts": "src/client/authFailures.ts",
+        "src/client/localRedirect.test.ts": "src/client/localRedirect.test.ts",
+        "src/client/localRedirect.ts": "src/client/localRedirect.ts",
+        "src/client/useAuthAction.test.ts": "src/client/useAuthAction.test.ts",
+        "src/client/useAuthAction.ts": "src/client/useAuthAction.ts",
+        "src/db/authSchema.ts": null,
+        "src/routes/api/auth.$.ts": "src/routes/api/auth.$.ts",
+        "src/server/auth.test.ts": "src/server/auth.test.ts",
+        "src/server/auth.ts": "src/server/auth.ts",
+        "src/server/random.test.ts": "src/server/random.test.ts",
+        "src/server/random.ts": "src/server/random.ts",
+        "src/server/session.ts": "src/server/session.ts"
+      },
+      "notes": [
+        "The Better Auth tables stay in src/db/schema.ts in the layout the existing database has (camelCase columns, ISO-text dates), not the recipe's src/db/authSchema.ts, because the production data already uses them; Better Auth 1.7's schema check passes against them (src/server/authFlow.test.ts).",
+        "createAuth takes a third argument, `generatedSecret()`: when none of BETTER_AUTH_SECRET, BETTER_AUTH_SECRETS, or AUTH_SECRET is set, it reads `$DATA_DIR/auth.secret`, which ras-stack 4's persistedSecret generated, so deployments that relied on that file keep their sessions; the production guard accepts AUTH_SECRET or the file too. Better Auth reads AUTH_SECRET itself.",
+        "emailAndPassword sets `minPasswordLength` to the product's PASSWORD_MIN_LENGTH, and the verification-email comment explains why verification is not required.",
+        "`me` returns only the user's id, name, and email to the browser, not the whole Better Auth user.",
+        "The sign-in, forgot-password, and reset-password pages are the product's own (src/routes/signin.tsx and siblings) and keep controlled inputs."
+      ]
+    },
     "database-sqlite": {
       "version": 1,
       "commit": "82fce4523ec914bd2e70aefd4bff84c10fb278c6",

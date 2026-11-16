@@ -22,7 +22,7 @@ export const Route = createFileRoute('/api/centrifugo/connect')({
           throw error
         }
         const parsed = connectRequest.safeParse(await request.json().catch(() => null))
-        const viewer = await currentUser(request.headers)
+        const viewer = await currentUser(request)
         if (!parsed.success || !viewer) return disconnect()
 
         try {
