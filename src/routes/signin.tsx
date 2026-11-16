@@ -1,6 +1,7 @@
 import { useQueryClient, useSuspenseQuery } from '@tanstack/react-query'
 import { Link, createFileRoute, useNavigate } from '@tanstack/react-router'
 import { authFailureMessage } from '../client/authFailures'
+import { localRedirectPath } from '../client/localRedirect'
 import { useAuthAction } from '../client/useAuthAction'
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
@@ -13,9 +14,7 @@ import { ProviderButtons } from '../client/components/ProviderButtons'
 import { signInOptionsQuery } from '../client/queries'
 
 export const Route = createFileRoute('/signin')({
-  validateSearch: (search: Record<string, unknown>): { next?: string } => ({
-    next: typeof search.next === 'string' ? search.next : undefined,
-  }),
+  validateSearch: (search: Record<string, unknown>): { next?: string } => ({ next: localRedirectPath(search.next) }),
   loader: ({ context }) => context.queryClient.ensureQueryData(signInOptionsQuery()),
   head: () => ({ meta: [{ title: 'Sign in — Sealed Lists' }] }),
   component: SignInPage,
